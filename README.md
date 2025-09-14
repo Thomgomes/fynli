@@ -3,7 +3,7 @@
 
 **Fynli** é uma aplicação web moderna de finanças pessoais, desenhada para resolver o desafio de rastrear e organizar despesas feitas para outras pessoas (familiares, amigos) a partir de uma conta central.
 
-**[▶️ Acessar a demonstração ao vivo](https://fynli.vercel.app)** (adicione o link quando estiver no ar)
+**[▶️ Acessar a demonstração ao vivo](https://fynli.vercel.app)**
 
 ---
 
