@@ -18,6 +18,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "sonner";
 import { Loader2, Mail, Lock, Chrome } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
+import { FcGoogle } from "react-icons/fc";
 
 const AuthSchema = Yup.object().shape({
   email: Yup.string()
@@ -238,14 +239,14 @@ export default function AuthPage() {
                   </div>
 
                   <Button
-                    variant="outline"
+                    variant="outlineGoogle"
                     onClick={handleGoogleAuth}
                     className="w-full"
                     disabled={isSubmitting}
                     type="button"
                   >
-                    <Chrome className="mr-2 h-4 w-4" />
-                    Google
+                    <FcGoogle className="mr-[-7px]" />
+                    oogle
                   </Button>
                 </Form>
               )}
