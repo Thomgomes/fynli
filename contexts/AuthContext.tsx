@@ -1,0 +1,110 @@
+"use client";
+
+import React, { createContext, useContext, useEffect, useState, ReactNode } from 'react';
+import { User, Session, AuthError, AuthResponse } from '@supabase/supabase-js';
+import { supabase } from '@/integrations/supabase/client';
+import { useRouter } from 'next/navigation';
+
+interface AuthContextType {
+  user: User | null;
+  session: Session | null;
+  isLoading: boolean;
+  signInWithPassword: (email: string, password: string) => Promise<AuthResponse>;
+  signUpWithPassword: (email: string, password: string) => Promise<AuthResponse>;
+  signInWithGoogle: () => Promise<void>;
+  signOut: () => Promise<{ error: AuthError | null }>;
+  refreshSession: () => Promise<void>;
+}
+
+const AuthContext = createContext<AuthContextType | undefined>(undefined);
+
+export function AuthProvider({ children }: { children: ReactNode }) {
+  const [user, setUser] = useState<User | null>(null);
+  const [session, setSession] = useState<Session | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const router = useRouter();
+
+  useEffect(() => {
+    let isMounted = true;
+
+    async function getInitialSession() {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (isMounted) {
+        setSession(session);
+        setUser(session?.user ?? null);
+        setIsLoading(false);
+      }
+    }
+
+    getInitialSession();
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      (event, session) => {
+        if (isMounted) {
+          setSession(session);
+          setUser(session?.user ?? null);
+          setIsLoading(false);
+        }
+      }
+    );
+
+    return () => {
+      isMounted = false;
+      subscription.unsubscribe();
+    };
+  }, []);
+
+  const value = {
+    user,
+    session,
+    isLoading,
+    
+    signInWithPassword: (email: string, password: string) => 
+      supabase.auth.signInWithPassword({ email, password }),
+
+    signUpWithPassword: (email: string, password: string) => 
+      supabase.auth.signUp({ 
+        email, 
+        password,
+        options: {
+          emailRedirectTo: `${window.location.origin}/dashboard`
+        }
+      }),
+
+    signInWithGoogle: async () => {
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+          redirectTo: `${window.location.origin}/auth/callback` 
+        }
+      });
+      if (error) console.error("Erro no login com Google:", error);
+    },
+
+    signOut: async () => {
+      const result = await supabase.auth.signOut();
+      router.push('/');
+      return result;
+    },
+
+    refreshSession: async () => {
+      const { data: { session } } = await supabase.auth.refreshSession();
+      setSession(session);
+      setUser(session?.user ?? null);
+    }
+  };
+
+  return (
+    <AuthContext.Provider value={value}>
+      {!isLoading && children}
+    </AuthContext.Provider>
+  );
+}
+
+export const useAuth = () => {
+  const context = useContext(AuthContext);
+  if (context === undefined) {
+    throw new Error('useAuth deve ser usado dentro de um AuthProvider');
+  }
+  return context;
+};
