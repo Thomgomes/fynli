@@ -3,6 +3,7 @@ import { Sora } from "next/font/google";
 import "./globals.css";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { Toaster } from "sonner";
+import { ThemeProvider } from "@/contexts/ThemeContext";
 
 const sora = Sora({
   subsets: ["latin"],
@@ -24,10 +25,18 @@ export default function RootLayout({
       <body
         className={`${sora.variable} antialiased`}
       >
+        <ThemeProvider
+        attribute="class"
+          defaultTheme="system"
+          enableSystem
+          disableTransitionOnChange
+        >
+
         <AuthProvider>
           {children}
           <Toaster richColors />
         </AuthProvider>
+        </ThemeProvider>
       </body>
     </html>
   );

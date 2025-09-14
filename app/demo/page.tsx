@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
@@ -22,6 +22,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { FynliSVG } from "@/components/fynliSVG";
+import { ThemeButton } from "@/components/themeButton";
 
 export default function DemoPage() {
   const [activeDemo, setActiveDemo] = useState<
@@ -87,7 +88,6 @@ export default function DemoPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background to-background/80">
-
       <header className="border-b bg-card/50 backdrop-blur-sm">
         <div className="container mx-auto px-4 py-4 flex justify-between items-center">
           <div className="flex items-center gap-2">
@@ -95,6 +95,7 @@ export default function DemoPage() {
             <h1 className="text-2xl font-bold">Splity</h1>
           </div>
           <div className="flex gap-2">
+            <ThemeButton />
             <Button variant="ghost" asChild>
               <Link href="/auth">Entrar</Link>
             </Button>
@@ -348,4 +349,4 @@ export default function DemoPage() {
       </footer>
     </div>
   );
-};
+}

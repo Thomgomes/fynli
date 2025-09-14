@@ -19,6 +19,7 @@ import { toast } from "sonner";
 import { Loader2, Mail, Lock, Chrome } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { FcGoogle } from "react-icons/fc";
+import Link from "next/link";
 
 const AuthSchema = Yup.object().shape({
   email: Yup.string()
@@ -253,6 +254,11 @@ export default function AuthPage() {
             </Formik>
           </CardContent>
         </Card>
+        <div className="mt-8 flex justify-center">
+          <Link href="/demo">
+            <Button variant="link">Ir para tela de Demonstração</Button>
+          </Link>
+        </div>
       </div>
     </div>
   );

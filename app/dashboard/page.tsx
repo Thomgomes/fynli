@@ -12,6 +12,7 @@ import {
 } from "@/components/ui/card";
 import { Loader2, LogOut } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
+import { ThemeButton } from "@/components/themeButton";
 
 export default function DashboardPage() {
   const { user, signOut, isLoading } = useAuth();
@@ -58,6 +59,7 @@ export default function DashboardPage() {
               <LogOut className="mr-2 h-4 w-4" />
               Sair (Logout)
             </Button>
+            <ThemeButton/>
           </CardContent>
         </Card>
       </div>
