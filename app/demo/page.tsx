@@ -13,7 +13,6 @@ import { Badge } from "@/components/ui/badge";
 import {
   Users,
   TrendingUp,
-  PieChart,
   Receipt,
   ArrowRight,
   DollarSign,
@@ -94,7 +93,7 @@ export default function DemoPage() {
         <div className="container mx-auto px-4 py-4 flex justify-between items-center">
           <div className="flex items-center gap-2">
             <FynliSVG className="h-8 w-8 text-primary" />
-            <h1 className="text-2xl font-bold">Splity</h1>
+            <h1 className="text-2xl font-bold">Fynli</h1>
           </div>
           <div className="flex gap-2">
             <ThemeButton/>

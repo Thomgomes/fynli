@@ -6,7 +6,7 @@ export default function Footer() {
     <footer className="py-8 px-4 border-t bg-card/30">
       <div className="container mx-auto text-center flex flex-col sm:flex-row justify-center sm:justify-between text-muted-foreground">
         <p className="flex items-center justify-center">
-          &copy; {new Date().getFullYear()} Splity. Todos os direitos
+          &copy; {new Date().getFullYear()} Fynli. Todos os direitos
           reservados.
         </p>
         <div className="flex items-center justify-center mt-4 sm:mt-0">
