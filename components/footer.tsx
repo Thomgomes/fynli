@@ -10,7 +10,7 @@ export default function Footer() {
           reservados.
         </p>
         <div className="flex items-center justify-center mt-4 sm:mt-0">
-          <p>Desenvolvido por</p>
+          <p className="bg-gradient-to-r from-primary/70 via-primary  to-primary/80 bg-clip-text text-transparent">Desenvolvido por</p>
           <Link href="https://thomgomes.vercel.app/" target="_blank">
             <Image src="/gifs/thomty.gif" alt="" width={40} height={40} />
           </Link>
