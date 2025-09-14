@@ -13,6 +13,7 @@ import {
   AuthError,
   AuthResponse,
   VerifyOtpParams,
+  UserResponse,
 } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
 import { useRouter } from "next/navigation";
@@ -36,7 +37,7 @@ interface AuthContextType {
   ) => Promise<{ session: Session | null; error: AuthError | null }>;
   refreshSession: () => Promise<void>;
   sendPasswordResetOtp: (email: string) => Promise<{ error: AuthError | null }>;
-  updatePassword: (password: string) => Promise<AuthResponse>;
+  updatePassword: (password: string) => Promise<UserResponse>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
