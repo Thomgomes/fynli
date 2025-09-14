@@ -67,7 +67,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         email, 
         password,
         options: {
-          emailRedirectTo: `${window.location.origin}/dashboard`
+          emailRedirectTo: `/dashboard`
         }
       }),
 
@@ -75,7 +75,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const { error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
-          redirectTo: `${window.location.origin}/dashboard` 
+          redirectTo: `/dashboard` 
         }
       });
       if (error) console.error("Erro no login com Google:", error);

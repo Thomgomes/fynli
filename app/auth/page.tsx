@@ -16,7 +16,7 @@ import {
 } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "sonner";
-import { Loader2, Mail, Lock, Chrome } from "lucide-react";
+import { Loader2, Mail, Lock } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { FcGoogle } from "react-icons/fc";
 import Link from "next/link";
