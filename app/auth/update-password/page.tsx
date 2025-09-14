@@ -17,7 +17,6 @@ import {
 import { toast } from "sonner";
 import { Loader2, Lock } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
-import Link from "next/link";
 
 const UpdatePasswordSchema = Yup.object().shape({
   password: Yup.string()
@@ -37,7 +36,7 @@ interface FormValues {
 }
 
 function UpdatePasswordComponent() {
-  const { updatePassword } = useAuth();
+  const { updatePassword, signOut } = useAuth();
   const router = useRouter();
 
   const handleUpdatePassword = async (
@@ -60,6 +59,11 @@ function UpdatePasswordComponent() {
     helpers.setSubmitting(false);
   };
 
+
+  const handleCancel = async () => {
+    await signOut();
+    router.push("/auth");
+  }
   return (
     <div className="min-h-screen bg-background flex flex-col items-center justify-center p-4">
       <Card className="w-full max-w-md">
@@ -141,9 +145,9 @@ function UpdatePasswordComponent() {
         </CardContent>
       </Card>
       <div className="mt-4 text-center text-sm">
-        <Link href="/auth" className="underline">
+        <Button variant="link" onClick={handleCancel} className="underline">
           Cancelar Redefinição
-        </Link>
+        </Button>
       </div>
     </div>
   );
