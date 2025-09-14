@@ -1,32 +1,23 @@
-'use client';
+"use client";
 
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from "@/contexts/AuthContext";
+import { useRouter } from "next/navigation";
 
+import { useEffect } from "react";
 
 export default function LoginPage() {
-  async function handleLoginWithGoogle() {
-    await supabase.auth.signInWithOAuth({
-      provider: 'google',
-      options: {
-        redirectTo: `${window.location.origin}/dashboard`,
-      },
-    });
-  }
+  const { user, isLoading } = useAuth();
+  const router = useRouter();
 
-  return (
-    <div className="flex justify-center items-center min-h-screen">
-      <Card className="w-96">
-        <CardHeader>
-          <CardTitle className="text-center">Bem-vindo ao Fynli</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <Button onClick={handleLoginWithGoogle} className="w-full">
-            Entrar com Google
-          </Button>
-        </CardContent>
-      </Card>
-    </div>
-  );
+  useEffect(() => {
+    if (!isLoading && !user) {
+      router.push("/demo");
+    }
+    if (!isLoading && user){
+      router.push("/dashboard");
+    }
+
+  }, [isLoading, user, router]);
+
+  return
 }
