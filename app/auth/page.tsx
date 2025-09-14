@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Formik, Form, Field, FormikHelpers } from "formik";
 import * as Yup from "yup";
@@ -26,7 +26,7 @@ const AuthSchema = Yup.object().shape({
     .email("Formato de e-mail inválido")
     .required("O e-mail é obrigatório"),
   password: Yup.string()
-    .min(6, "A senha deve ter no mínimo 6 caracteres")
+    .min(8, "A senha deve ter no mínimo 6 caracteres")
     .matches(/[a-z]/, "A senha deve conter pelo menos uma letra minúscula")
     .matches(/[A-Z]/, "A senha deve conter pelo menos uma letra maiúscula")
     .matches(/[0-9]/, "A senha deve conter pelo menos um número")
@@ -42,6 +42,7 @@ export default function AuthPage() {
   const { signInWithPassword, signUpWithPassword, signInWithGoogle, user } =
     useAuth();
   const router = useRouter();
+  const [mode, setMode] = useState<"signin" | "signup">("signin");
 
   React.useEffect(() => {
     if (user) {
@@ -51,12 +52,9 @@ export default function AuthPage() {
 
   const handleAuthSubmit = async (
     values: FormValues,
-    helpers: FormikHelpers<FormValues>,
-    mode: "signin" | "signup"
+    helpers: FormikHelpers<FormValues>
   ) => {
-    helpers.setSubmitting(true);
-
-    const { error } =
+    const { data, error } =
       mode === "signin"
         ? await signInWithPassword(values.email, values.password)
         : await signUpWithPassword(values.email, values.password);
@@ -68,15 +66,15 @@ export default function AuthPage() {
           : error.message === "User already registered"
           ? "Este e-mail já está cadastrado. Tente fazer login."
           : "Ocorreu um erro. Tente novamente.";
-
       toast.error("Erro na Autenticação", { description });
     } else {
       if (mode === "signup") {
-        toast.success("Verifique seu E-mail!", {
-          description:
-            "Conta criada com sucesso! Enviamos um link de confirmação para o seu e-mail.",
-        });
-        helpers.resetForm();
+        if (data.session === null) {
+          toast.info("Cadastro realizado!", {
+            description: "Enviamos um código de verificação para o seu e-mail.",
+          });
+          router.push(`/auth/otp?email=${encodeURIComponent(values.email)}`);
+        }
       } else {
         toast.success("Bem-vindo de volta!", {
           description: "Login realizado com sucesso.",
@@ -94,7 +92,9 @@ export default function AuthPage() {
     <div className="min-h-screen bg-background flex items-center justify-center p-4">
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold text-primary mb-2">Fynli</h1>
+          <Link href="/">
+            <h1 className="text-4xl font-bold text-primary mb-2">Fynli</h1>
+          </Link>
           <p className="text-muted-foreground">
             Organize seus gastos de forma inteligente
           </p>
@@ -111,16 +111,22 @@ export default function AuthPage() {
             <Formik<FormValues>
               initialValues={{ email: "", password: "" }}
               validationSchema={AuthSchema}
-              onSubmit={(values, helpers) => {}}
+              onSubmit={handleAuthSubmit}
             >
-              {({ isSubmitting, errors, touched, isValid, dirty }) => (
-                <Form>
-                  <Tabs defaultValue="signin" className="w-full">
-                    <TabsList className="grid w-full grid-cols-2">
-                      <TabsTrigger value="signin">Entrar</TabsTrigger>
-                      <TabsTrigger value="signup">Cadastrar</TabsTrigger>
-                    </TabsList>
+              {({ errors, touched, isSubmitting, isValid, dirty }) => (
+                <Tabs
+                  defaultValue="signin"
+                  className="w-full"
+                  onValueChange={(value) =>
+                    setMode(value as "signin" | "signup")
+                  }
+                >
+                  <TabsList className="grid w-full grid-cols-2">
+                    <TabsTrigger value="signin">Entrar</TabsTrigger>
+                    <TabsTrigger value="signup">Cadastrar</TabsTrigger>
+                  </TabsList>
 
+                  <Form>
                     <div className="space-y-4 pt-4">
                       <div className="space-y-2">
                         <Label htmlFor="email">Email</Label>
@@ -173,60 +179,32 @@ export default function AuthPage() {
                       </div>
                     </div>
 
-                    <TabsContent value="signin" className="space-y-4 pt-4">
+                    <TabsContent value="signin" className="mt-4">
                       <Button
                         type="submit"
-                        onClick={(e) => {
-                          e.preventDefault();
-                          handleAuthSubmit(
-                            {
-                              email: e.currentTarget.form?.email.value,
-                              password: e.currentTarget.form?.password.value,
-                            },
-                            {
-                              setSubmitting: (isSubmitting) => {},
-                              resetForm: () => {},
-                            } as FormikHelpers<FormValues>,
-                            "signin"
-                          );
-                        }}
                         className="w-full"
                         disabled={!isValid || !dirty || isSubmitting}
                       >
-                        {isSubmitting ? (
+                        {isSubmitting && mode === "signin" ? (
                           <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                         ) : null}
                         Entrar
                       </Button>
                     </TabsContent>
 
-                    <TabsContent value="signup" className="space-y-4 pt-4">
+                    <TabsContent value="signup" className="mt-4">
                       <Button
                         type="submit"
-                        onClick={(e) => {
-                          e.preventDefault();
-                          handleAuthSubmit(
-                            {
-                              email: e.currentTarget.form?.email.value,
-                              password: e.currentTarget.form?.password.value,
-                            },
-                            {
-                              setSubmitting: (isSubmitting) => {},
-                              resetForm: () => {},
-                            } as FormikHelpers<FormValues>,
-                            "signup"
-                          );
-                        }}
                         className="w-full"
                         disabled={!isValid || !dirty || isSubmitting}
                       >
-                        {isSubmitting ? (
+                        {isSubmitting && mode === "signup" ? (
                           <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                         ) : null}
                         Criar conta
                       </Button>
                     </TabsContent>
-                  </Tabs>
+                  </Form>
 
                   <div className="relative my-6">
                     <div className="absolute inset-0 flex items-center">
@@ -240,16 +218,16 @@ export default function AuthPage() {
                   </div>
 
                   <Button
-                    variant="outlineGoogle"
+                    variant="outline"
                     onClick={handleGoogleAuth}
                     className="w-full"
                     disabled={isSubmitting}
                     type="button"
                   >
-                    <FcGoogle className="mr-[-7px]" />
-                    oogle
+                    <FcGoogle className="mr-2 h-5 w-5" />
+                    Google
                   </Button>
-                </Form>
+                </Tabs>
               )}
             </Formik>
           </CardContent>

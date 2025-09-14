@@ -1,7 +1,7 @@
 "use client";
 
 import React, { createContext, useContext, useEffect, useState, ReactNode } from 'react';
-import { User, Session, AuthError, AuthResponse } from '@supabase/supabase-js';
+import { User, Session, AuthError, AuthResponse, VerifyOtpParams } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
 import { useRouter } from 'next/navigation';
 
@@ -13,6 +13,7 @@ interface AuthContextType {
   signUpWithPassword: (email: string, password: string) => Promise<AuthResponse>;
   signInWithGoogle: () => Promise<void>;
   signOut: () => Promise<{ error: AuthError | null }>;
+  verifyOtp: (params: VerifyOtpParams) => Promise<{ session: Session | null; error: AuthError | null }>;
   refreshSession: () => Promise<void>;
 }
 
@@ -88,6 +89,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const result = await supabase.auth.signOut();
       router.push('/');
       return result;
+    },
+
+    verifyOtp: async (params: VerifyOtpParams) => {
+      const { data, error } = await supabase.auth.verifyOtp(params);
+      return { session: data.session, error };
     },
 
     refreshSession: async () => {
