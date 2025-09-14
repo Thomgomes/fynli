@@ -1,36 +1,30 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+![Status](https://img.shields.io/badge/status-em_desenvolvimento-yellow)
+![Tecnologia](https://img.shields.io/badge/tech-Next.js%20%7C%20Supabase-blue)
 
-## Getting Started
+**Fynli** é uma aplicação web moderna de finanças pessoais, desenhada para resolver o desafio de rastrear e organizar despesas feitas para outras pessoas (familiares, amigos) a partir de uma conta central.
 
-First, run the development server:
+**[▶️ Acessar a demonstração ao vivo](https://fynli.vercel.app)** (adicione o link quando estiver no ar)
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+---
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## 💡 Sobre o Projeto
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Fynli nasceu de uma necessidade pessoal: como organizar os gastos quando você usa sua própria conta para fazer compras para outras pessoas? Diferente de apps de divisão de contas que focam em "quem deve a quem", o Fynli responde à pergunta **"Para onde foi o meu dinheiro e em nome de quem?"**.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+O objetivo não é gerenciar dívidas, mas sim oferecer clareza, relatórios visuais e uma forma simples de entender como suas finanças estão sendo distribuídas entre diferentes perfis de gasto.
 
-## Learn More
+## 🚀 Tecnologias Utilizadas
 
-To learn more about Next.js, take a look at the following resources:
+Este projeto é uma demonstração de uma stack de desenvolvimento full-stack moderna, reativa e escalável.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+* **Frontend:**
+    * **Framework:** Next.js 15 (App Router) & React 19
+    * **Linguagem:** TypeScript
+    * **Estilização:** Tailwind CSS 4 & Shadcn/UI
+    * **Visualização de Dados:** Recharts / Chart.js
+* **Backend & Banco de Dados:**
+    * **Plataforma:** Supabase
+    * **Banco de Dados:** PostgreSQL
+    * **Autenticação:** Supabase Auth (Login com Google)
+    * **Armazenamento:** Supabase Storage (para comprovantes, etc.)
+* **Hospedagem:** Vercel
