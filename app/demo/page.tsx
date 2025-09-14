@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
@@ -88,7 +88,6 @@ export default function DemoPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background to-background/80">
-
       <header className="border-b bg-card/50 backdrop-blur-sm">
         <div className="container mx-auto px-4 py-4 flex justify-between items-center">
           <div className="flex items-center gap-2">
@@ -96,12 +95,9 @@ export default function DemoPage() {
             <h1 className="text-2xl font-bold">Fynli</h1>
           </div>
           <div className="flex gap-2">
-            <ThemeButton/>
+            <ThemeButton />
             <Button variant="ghost" asChild>
               <Link href="/auth">Entrar</Link>
-            </Button>
-            <Button asChild>
-              <Link href="/auth">Começar Grátis</Link>
             </Button>
           </div>
         </div>
@@ -126,7 +122,7 @@ export default function DemoPage() {
               </Link>
             </Button>
             <Button size="lg" variant="outline">
-              Ver Demonstração
+              <a href="#demo">Ver Demonstração</a>
             </Button>
           </div>
         </div>
@@ -174,7 +170,7 @@ export default function DemoPage() {
         </div>
       </section>
 
-      <section className="py-16 px-4">
+      <section className="py-16 px-4" id="demo">
         <div className="container mx-auto">
           <h3 className="text-3xl font-bold text-center mb-8">
             Veja como funciona
@@ -343,7 +339,7 @@ export default function DemoPage() {
         </div>
       </section>
 
-      <Footer/>
+      <Footer />
     </div>
   );
-};
+}
