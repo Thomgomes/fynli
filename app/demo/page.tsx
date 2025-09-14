@@ -21,6 +21,7 @@ import {
   BarChart3,
 } from "lucide-react";
 import Link from "next/link";
+import { FynliSVG } from "@/components/fynliSVG";
 
 export default function DemoPage() {
   const [activeDemo, setActiveDemo] = useState<
@@ -90,7 +91,7 @@ export default function DemoPage() {
       <header className="border-b bg-card/50 backdrop-blur-sm">
         <div className="container mx-auto px-4 py-4 flex justify-between items-center">
           <div className="flex items-center gap-2">
-            <PieChart className="h-8 w-8 text-primary" />
+            <FynliSVG className="h-8 w-8 text-primary" />
             <h1 className="text-2xl font-bold">Splity</h1>
           </div>
           <div className="flex gap-2">
