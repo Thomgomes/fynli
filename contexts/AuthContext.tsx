@@ -1,20 +1,42 @@
 "use client";
 
-import React, { createContext, useContext, useEffect, useState, ReactNode } from 'react';
-import { User, Session, AuthError, AuthResponse, VerifyOtpParams } from '@supabase/supabase-js';
-import { supabase } from '@/integrations/supabase/client';
-import { useRouter } from 'next/navigation';
+import React, {
+  createContext,
+  useContext,
+  useEffect,
+  useState,
+  ReactNode,
+} from "react";
+import {
+  User,
+  Session,
+  AuthError,
+  AuthResponse,
+  VerifyOtpParams,
+} from "@supabase/supabase-js";
+import { supabase } from "@/integrations/supabase/client";
+import { useRouter } from "next/navigation";
 
 interface AuthContextType {
   user: User | null;
   session: Session | null;
   isLoading: boolean;
-  signInWithPassword: (email: string, password: string) => Promise<AuthResponse>;
-  signUpWithPassword: (email: string, password: string) => Promise<AuthResponse>;
+  signInWithPassword: (
+    email: string,
+    password: string
+  ) => Promise<AuthResponse>;
+  signUpWithPassword: (
+    email: string,
+    password: string
+  ) => Promise<AuthResponse>;
   signInWithGoogle: () => Promise<void>;
   signOut: () => Promise<{ error: AuthError | null }>;
-  verifyOtp: (params: VerifyOtpParams) => Promise<{ session: Session | null; error: AuthError | null }>;
+  verifyOtp: (
+    params: VerifyOtpParams
+  ) => Promise<{ session: Session | null; error: AuthError | null }>;
   refreshSession: () => Promise<void>;
+  sendPasswordResetOtp: (email: string) => Promise<{ error: AuthError | null }>;
+  updatePassword: (password: string) => Promise<AuthResponse>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -29,7 +51,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     let isMounted = true;
 
     async function getInitialSession() {
-      const { data: { session } } = await supabase.auth.getSession();
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
       if (isMounted) {
         setSession(session);
         setUser(session?.user ?? null);
@@ -39,15 +63,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     getInitialSession();
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (event, session) => {
-        if (isMounted) {
-          setSession(session);
-          setUser(session?.user ?? null);
-          setIsLoading(false);
-        }
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((event, session) => {
+      if (isMounted) {
+        setSession(session);
+        setUser(session?.user ?? null);
+        setIsLoading(false);
       }
-    );
+    });
 
     return () => {
       isMounted = false;
@@ -59,35 +83,39 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     user,
     session,
     isLoading,
-    
-    signInWithPassword: (email: string, password: string) => 
+
+    signInWithPassword: (email: string, password: string) =>
       supabase.auth.signInWithPassword({ email, password }),
 
-    signUpWithPassword: (email: string, password: string) => 
-      supabase.auth.signUp({ 
-        email, 
+    signUpWithPassword: (email: string, password: string) =>
+      supabase.auth.signUp({
+        email,
         password,
         options: {
-          emailRedirectTo: `${window.location.origin}/auth/callback`
-        }
+          emailRedirectTo: `${window.location.origin}/auth/callback`,
+        },
       }),
 
     signInWithGoogle: async () => {
       const { error } = await supabase.auth.signInWithOAuth({
-        provider: 'google',
+        provider: "google",
         options: {
           redirectTo: `${window.location.origin}/auth/callback`,
           queryParams: {
-            prompt: 'select_account',
-          }
-        }
+            prompt: "select_account",
+          },
+        },
       });
       if (error) console.error("Erro no login com Google:", error);
     },
 
+    sendPasswordResetOtp: async (email: string) => {
+      return supabase.auth.resetPasswordForEmail(email);
+    },
+
     signOut: async () => {
       const result = await supabase.auth.signOut();
-      router.push('/');
+      router.push("/");
       return result;
     },
 
@@ -97,10 +125,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     },
 
     refreshSession: async () => {
-      const { data: { session } } = await supabase.auth.refreshSession();
+      const {
+        data: { session },
+      } = await supabase.auth.refreshSession();
       setSession(session);
       setUser(session?.user ?? null);
-    }
+    },
+
+    updatePassword: async (password: string) => {
+      return supabase.auth.updateUser({ password });
+    },
   };
 
   return (
@@ -113,7 +147,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 export const useAuth = () => {
   const context = useContext(AuthContext);
   if (context === undefined) {
-    throw new Error('useAuth deve ser usado dentro de um AuthProvider');
+    throw new Error("useAuth deve ser usado dentro de um AuthProvider");
   }
   return context;
 };

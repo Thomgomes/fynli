@@ -178,7 +178,14 @@ export default function AuthPage() {
                         )}
                       </div>
                     </div>
-
+                    <div className="text-right mb-4 mt-2">
+                      <Link
+                        href="/auth/forgot-password"
+                        className="text-sm text-muted-foreground hover:text-primary underline"
+                      >
+                        Esqueceu a senha?
+                      </Link>
+                    </div>
                     <TabsContent value="signin" className="mt-4">
                       <Button
                         type="submit"

@@ -28,7 +28,6 @@ function VerifyOtpPageContent() {
   const searchParams = useSearchParams();
   const { verifyOtp } = useAuth();
 
-  // Pega o e-mail da URL para usar na verificação
   const email = searchParams.get("email");
 
   useEffect(() => {
@@ -66,8 +65,6 @@ function VerifyOtpPageContent() {
       toast.success("E-mail verificado!", {
         description: "Sua conta foi confirmada com sucesso. Redirecionando...",
       });
-      // O onAuthStateChange vai detectar a nova sessão e o useEffect no dashboard
-      // vai cuidar do resto, mas podemos forçar o redirecionamento aqui.
       router.push("/dashboard");
     }
     setIsLoading(false);
@@ -77,7 +74,9 @@ function VerifyOtpPageContent() {
     <div className="min-h-screen bg-background flex flex-col gap-6 items-center justify-center p-4">
       <Card className="w-full max-w-md">
         <CardHeader className="text-center">
-          <CardTitle className="text-xl sm:text-2xl">Verifique seu E-mail</CardTitle>
+          <CardTitle className="text-xl sm:text-2xl">
+            Verifique seu E-mail
+          </CardTitle>
           <CardDescription>
             Enviamos um código de 6 dígitos para <strong>{email}</strong>. Por
             favor, insira-o abaixo.
@@ -109,14 +108,13 @@ function VerifyOtpPageContent() {
       <div className="flex flex-col items-center text-sm text-muted-foreground gap-1">
         <p>Digitou o Email errado?</p>
         <Link href="/auth" className="text-primary">
-        <Button variant="link">Voltar</Button>
+          <Button variant="link">Voltar</Button>
         </Link>
       </div>
     </div>
   );
 }
 
-// O Suspense é importante para garantir que o useSearchParams funcione corretamente
 export default function VerifyOtpPage() {
   return (
     <Suspense fallback={<div>Carregando...</div>}>
