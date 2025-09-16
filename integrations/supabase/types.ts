@@ -67,7 +67,6 @@ export type Database = {
       }
       categories: {
         Row: {
-          color: string | null
           created_at: string
           icon: string | null
           id: string
@@ -76,7 +75,6 @@ export type Database = {
           user_id: string
         }
         Insert: {
-          color?: string | null
           created_at?: string
           icon?: string | null
           id?: string
@@ -85,7 +83,6 @@ export type Database = {
           user_id: string
         }
         Update: {
-          color?: string | null
           created_at?: string
           icon?: string | null
           id?: string
