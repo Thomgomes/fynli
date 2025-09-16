@@ -28,7 +28,8 @@ interface AuthContextType {
   ) => Promise<AuthResponse>;
   signUpWithPassword: (
     email: string,
-    password: string
+    password: string,
+    name: string
   ) => Promise<AuthResponse>;
   signInWithGoogle: () => Promise<void>;
   signOut: () => Promise<{ error: AuthError | null }>;
@@ -88,11 +89,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     signInWithPassword: (email: string, password: string) =>
       supabase.auth.signInWithPassword({ email, password }),
 
-    signUpWithPassword: (email: string, password: string) =>
+    signUpWithPassword: (email: string, password: string, name: string) =>
       supabase.auth.signUp({
         email,
         password,
         options: {
+          data: {
+            display_name: name,
+          },
           emailRedirectTo: `${window.location.origin}/auth/callback`,
         },
       }),

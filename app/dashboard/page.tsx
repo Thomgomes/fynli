@@ -33,29 +33,31 @@ export default function DashboardPage() {
   }
 
   if (user) {
+    // Lógica para pegar o nome de diferentes fontes (Google ou cadastro manual)
+    const displayName = user.user_metadata?.display_name || user.user_metadata?.full_name || 'Usuário';
+
     return (
       <div className="min-h-screen bg-background flex items-center justify-center p-4">
         <Card className="w-full max-w-lg">
           <CardHeader>
-            <CardTitle>Bem-vindo ao Dashboard do Fynli!</CardTitle>
+            {/* Mensagem de boas-vindas personalizada */}
+            <CardTitle>Bem-vindo, {displayName}!</CardTitle>
             <CardDescription>
-              Esta é sua área segura. O login está funcionando corretamente.
+              Este é seu dashboard seguro no Fynli.
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
-            <div className="p-4 border rounded-md bg-muted">
-              <p className="text-sm font-medium text-muted-foreground">
-                Usuário Logado:
-              </p>
-              <p className="text-lg font-semibold text-foreground">
-                {user.email}
-              </p>
+            <div className="p-4 border rounded-md bg-muted space-y-2">
+              <div>
+                <p className="text-sm font-medium text-muted-foreground">Nome de Exibição:</p>
+                <p className="text-lg font-semibold text-foreground">{displayName}</p>
+              </div>
+              <div>
+                <p className="text-sm font-medium text-muted-foreground">E-mail:</p>
+                <p className="text-lg font-semibold text-foreground">{user.email}</p>
+              </div>
             </div>
-            <Button
-              onClick={signOut}
-              className="w-full"
-              variant="destructive"
-            >
+            <Button onClick={signOut} className="w-full" variant="destructive">
               <LogOut className="mr-2 h-4 w-4" />
               Sair (Logout)
             </Button>
@@ -66,6 +68,5 @@ export default function DashboardPage() {
     );
   }
 
-  // Se o useEffect ainda não redirecionou, retornamos null para não renderizar nada
   return null;
 }

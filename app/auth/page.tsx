@@ -16,17 +16,27 @@ import {
 } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "sonner";
-import { Loader2, Mail, Lock } from "lucide-react";
+import { Loader2, Mail, Lock, User as UserIcon } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { FcGoogle } from "react-icons/fc";
 import Link from "next/link";
 
-const AuthSchema = Yup.object().shape({
+const signInSchema = Yup.object().shape({
+  email: Yup.string()
+    .email("Formato de e-mail inválido")
+    .required("O e-mail é obrigatório"),
+  password: Yup.string().required("A senha é obrigatória"),
+});
+
+const signUpSchema = Yup.object().shape({
+  name: Yup.string()
+    .min(3, "O nome deve ter pelo menos 3 caracteres")
+    .required("O nome é obrigatório"),
   email: Yup.string()
     .email("Formato de e-mail inválido")
     .required("O e-mail é obrigatório"),
   password: Yup.string()
-    .min(8, "A senha deve ter no mínimo 6 caracteres")
+    .min(8, "A senha deve ter no mínimo 8 caracteres")
     .matches(/[a-z]/, "A senha deve conter pelo menos uma letra minúscula")
     .matches(/[A-Z]/, "A senha deve conter pelo menos uma letra maiúscula")
     .matches(/[0-9]/, "A senha deve conter pelo menos um número")
@@ -34,6 +44,7 @@ const AuthSchema = Yup.object().shape({
 });
 
 interface FormValues {
+  name: string;
   email: string;
   password: string;
 }
@@ -57,7 +68,7 @@ export default function AuthPage() {
     const { data, error } =
       mode === "signin"
         ? await signInWithPassword(values.email, values.password)
-        : await signUpWithPassword(values.email, values.password);
+        : await signUpWithPassword(values.email, values.password, values.name);
 
     if (error) {
       const description =
@@ -109,8 +120,8 @@ export default function AuthPage() {
           </CardHeader>
           <CardContent>
             <Formik<FormValues>
-              initialValues={{ email: "", password: "" }}
-              validationSchema={AuthSchema}
+              initialValues={{ name: "", email: "", password: "" }}
+              validationSchema={mode === "signup" ? signUpSchema : signInSchema}
               onSubmit={handleAuthSubmit}
             >
               {({ errors, touched, isSubmitting, isValid, dirty }) => (
@@ -127,7 +138,7 @@ export default function AuthPage() {
                   </TabsList>
 
                   <Form>
-                    <div className="space-y-4 pt-4">
+                    <TabsContent value="signin" className="space-y-4 pt-4">
                       <div className="space-y-2">
                         <Label htmlFor="email">Email</Label>
                         <div className="relative">
@@ -152,7 +163,6 @@ export default function AuthPage() {
                           </p>
                         )}
                       </div>
-
                       <div className="space-y-2">
                         <Label htmlFor="password">Senha</Label>
                         <div className="relative">
@@ -177,16 +187,14 @@ export default function AuthPage() {
                           </p>
                         )}
                       </div>
-                    </div>
-                    <div className="text-right mb-4 mt-2">
-                      <Link
-                        href="/auth/forgot-password"
-                        className="text-sm text-muted-foreground hover:text-primary underline"
-                      >
-                        Esqueceu a senha?
-                      </Link>
-                    </div>
-                    <TabsContent value="signin" className="mt-4">
+                      <div className="text-right mb-4 mt-2">
+                        <Link
+                          href="/auth/forgot-password"
+                          className="text-sm text-muted-foreground hover:text-primary underline"
+                        >
+                          Esqueceu a senha?
+                        </Link>
+                      </div>
                       <Button
                         type="submit"
                         className="w-full"
@@ -199,7 +207,79 @@ export default function AuthPage() {
                       </Button>
                     </TabsContent>
 
-                    <TabsContent value="signup" className="mt-4">
+                    <TabsContent value="signup" className="space-y-4 pt-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="name">Nome</Label>
+                        <div className="relative">
+                          <UserIcon className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                          <Field
+                            as={Input}
+                            id="name"
+                            name="name"
+                            type="text"
+                            placeholder="Seu nome completo"
+                            className={`pl-10 ${
+                              touched.name && errors.name
+                                ? "border-destructive"
+                                : ""
+                            }`}
+                            disabled={isSubmitting}
+                          />
+                        </div>
+                        {touched.name && errors.name && (
+                          <p className="text-sm text-destructive">
+                            {errors.name}
+                          </p>
+                        )}
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="email">Email</Label>
+                        <div className="relative">
+                          <Mail className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                          <Field
+                            as={Input}
+                            id="email"
+                            name="email"
+                            type="email"
+                            placeholder="seu@email.com"
+                            className={`pl-10 ${
+                              touched.email && errors.email
+                                ? "border-destructive"
+                                : ""
+                            }`}
+                            disabled={isSubmitting}
+                          />
+                        </div>
+                        {touched.email && errors.email && (
+                          <p className="text-sm text-destructive">
+                            {errors.email}
+                          </p>
+                        )}
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="password">Senha</Label>
+                        <div className="relative">
+                          <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                          <Field
+                            as={Input}
+                            id="password"
+                            name="password"
+                            type="password"
+                            placeholder="Sua senha"
+                            className={`pl-10 ${
+                              touched.password && errors.password
+                                ? "border-destructive"
+                                : ""
+                            }`}
+                            disabled={isSubmitting}
+                          />
+                        </div>
+                        {touched.password && errors.password && (
+                          <p className="text-sm text-destructive">
+                            {errors.password}
+                          </p>
+                        )}
+                      </div>
                       <Button
                         type="submit"
                         className="w-full"
@@ -223,7 +303,6 @@ export default function AuthPage() {
                       </span>
                     </div>
                   </div>
-
                   <Button
                     variant="outline"
                     onClick={handleGoogleAuth}
