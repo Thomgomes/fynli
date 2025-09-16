@@ -17,6 +17,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Tables } from "@/integrations/supabase/types";
 import { availableIcons, iconMap } from "@/lib/icons";
 import { useCategories } from "@/hooks/use-categories";
+import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 
 type CategoryFormValues = {
   name: string;
@@ -103,7 +104,16 @@ export default function CategoriesPage() {
                       <DropdownMenuTrigger asChild><Button variant="ghost" size="icon" className="h-8 w-8"><MoreHorizontal className="h-4 w-4" /></Button></DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
                         <DropdownMenuItem onClick={() => openEditModal(cat)} className="gap-2 cursor-pointer"><Edit className="h-4 w-4" /> Editar</DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => handleDelete(cat.id)} className="gap-2 text-destructive cursor-pointer"><Trash2 className="h-4 w-4" /> Deletar</DropdownMenuItem>
+
+                        <ConfirmDialog
+                          title="Tem certeza que deseja deletar?"
+                          description={`Esta ação não pode ser desfeita. Isso irá deletar permanentemente a categoria "${cat.name}".`}
+                          onConfirm={() => deleteCategory(cat.id)}
+                        >
+                          <DropdownMenuItem onSelect={(e) => e.preventDefault()} className="gap-2 text-destructive cursor-pointer">
+                              <Trash2 className="h-4 w-4" /> Deletar
+                          </DropdownMenuItem>
+                        </ConfirmDialog>
                       </DropdownMenuContent>
                     </DropdownMenu>
                   </div>
