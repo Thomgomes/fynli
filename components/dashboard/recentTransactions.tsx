@@ -6,7 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
-import { useRecentTransactions } from "@/hooks/useRecentTransactions";
+import { useRecentTransactions } from "@/hooks/use-recent-transactions";
 
 
 // Componente de esqueleto para o estado de carregamento
@@ -69,11 +69,6 @@ export function RecentTransactions() {
                 <Badge 
                   variant="outline"
                   className="mt-1 font-normal"
-                  style={{ 
-                    backgroundColor: `${expense.categories.color}20`, // Cor com ~12% de opacidade
-                    borderColor: expense.categories.color || undefined,
-                    color: expense.categories.color || undefined
-                  }}
                 >
                   {expense.categories.name}
                 </Badge>

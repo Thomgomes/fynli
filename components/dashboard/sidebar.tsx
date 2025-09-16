@@ -11,6 +11,7 @@ import {
   ChevronLeft,
   ChevronRight,
   FileText,
+  Tags,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -18,6 +19,7 @@ import { Button } from "@/components/ui/button";
 const sidebarItems = [
   { title: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
   { title: "Pessoas", href: "/dashboard/people", icon: Users },
+  { title: "Categorias", href: "/dashboard/categories", icon: Tags },
   { title: "Transações", href: "/dashboard/transactions", icon: FileText },
   { title: "Relatórios", href: "/dashboard/reports", icon: BarChart3 },
   { title: "Configurações", href: "/dashboard/settings", icon: Settings },
