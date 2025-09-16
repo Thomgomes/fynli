@@ -1,22 +1,10 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { TrendingUp, Users, PiggyBank } from "lucide-react";
-import { supabase } from "@/integrations/supabase/client";
-
 import { Skeleton } from "@/components/ui/skeleton";
-import { toast } from "sonner";
-import { useAuth } from "@/contexts/AuthContext";
-
-// Tipagem para os dados que esperamos da nossa função SQL
-type DashboardStats = {
-  total_selected_month: number;
-  total_all_time: number;
-  top_person_name: string | null;
-  top_person_amount: number | null;
-};
+import { useDashboardStats } from "@/hooks/useDashboardStats";
+ // 1. Importar o hook
 
 function CardSkeleton() {
   return (
@@ -34,49 +22,24 @@ function CardSkeleton() {
 }
 
 export function DashboardCards() {
-  const [stats, setStats] = useState<DashboardStats | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const { user } = useAuth();
-
-  // Vamos usar o mês e ano atuais como padrão para o filtro inicial
+  // Parâmetros para os filtros que o hook vai usar
   const currentYear = new Date().getFullYear();
-  const currentMonth = new Date().getMonth() + 1; // JS months são 0-11
+  const currentMonth = new Date().getMonth() + 1;
 
-  const fetchDashboardData = useCallback(async () => {
-    if (!user) return;
-    setIsLoading(true);
-
-    try {
-      // 1. Corrigimos a chamada RPC, passando os parâmetros necessários
-      const { data, error } = await supabase.rpc('get_dashboard_stats', { 
-        user_id_param: user.id,
-        filter_year: currentYear,
-        filter_month: currentMonth
-      });
-
-      if (error) throw error;
-      
-      // A função RPC retorna um array com um único objeto, então pegamos o primeiro.
-      const fetchedStats = data[0]; 
-      setStats(fetchedStats);
-
-    } catch (error: any) {
-      console.error('Erro ao buscar dados do dashboard:', error);
-      toast.error("Erro ao carregar os cards", { description: error.message });
-    } finally {
-      setIsLoading(false);
-    }
-  }, [user, currentYear, currentMonth]); // Adicionamos as dependências corretas
-
-  useEffect(() => {
-    fetchDashboardData();
-  }, [fetchDashboardData]);
+  // 2. TODA a lógica de state e fetch foi substituída por esta única linha!
+  const { stats, isLoading, error } = useDashboardStats({ year: currentYear, month: currentMonth });
 
   const formatCurrency = (value: number | null | undefined) => {
     if (value === null || value === undefined) return "R$ 0,00";
     return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value);
   };
+  
+  if (error) {
+    // Uma forma simples de mostrar o erro na UI
+    return <div className="text-sm text-destructive p-4 border border-destructive/50 bg-destructive/10 rounded-lg">Erro ao carregar dados dos cards.</div>;
+  }
 
+  // O esqueleto é exibido enquanto isLoading é true ou os dados (stats) ainda não chegaram.
   if (isLoading || !stats) {
     return (
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -87,6 +50,7 @@ export function DashboardCards() {
     );
   }
 
+  // 3. O restante do código usa 'stats' que vem diretamente do hook.
   const cards = [
     { 
       title: "Gasto Total do Mês", 

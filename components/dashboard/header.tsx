@@ -1,6 +1,6 @@
 "use client";
 
-import { Settings, LogOut } from "lucide-react";
+import { Settings, LogOut, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
@@ -16,7 +16,11 @@ import Link from "next/link";
 import { useAuth } from "@/contexts/AuthContext";
 import { ThemeButton } from "../themeButton";
 
-export function DashboardHeader() {
+interface DashboardHeaderProps {
+  onAddExpenseClick: () => void;
+}
+
+export function DashboardHeader({ onAddExpenseClick }: DashboardHeaderProps) {
   const { user, signOut } = useAuth();
 
   // Função para pegar as iniciais do nome ou do e-mail
@@ -41,6 +45,13 @@ export function DashboardHeader() {
       </div>
 
       <div className="flex items-center gap-4">
+        <Button 
+            className="gap-2 gradient-primary text-primary-foreground hover:opacity-90 transition-opacity"
+            onClick={onAddExpenseClick}
+          >
+            <Plus className="h-4 w-4" />
+            Adicionar Gasto
+          </Button>
         <ThemeButton />
 
         {/* User Menu */}
