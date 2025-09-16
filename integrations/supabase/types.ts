@@ -14,41 +14,87 @@ export type Database = {
   }
   public: {
     Tables: {
+      categories: {
+        Row: {
+          color: string | null
+          created_at: string
+          icon: string | null
+          id: string
+          name: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          color?: string | null
+          created_at?: string
+          icon?: string | null
+          id?: string
+          name: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          color?: string | null
+          created_at?: string
+          icon?: string | null
+          id?: string
+          name?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       expenses: {
         Row: {
           amount: number
-          category: string | null
+          category_id: string | null
           created_at: string
           date: string
           description: string
           id: string
+          installments: number
+          is_recurring: boolean
           person_id: string
+          reimbursement_status: Database["public"]["Enums"]["reimbursement_status"]
           updated_at: string
           user_id: string
         }
         Insert: {
           amount: number
-          category?: string | null
+          category_id?: string | null
           created_at?: string
           date?: string
           description: string
           id?: string
+          installments?: number
+          is_recurring?: boolean
           person_id: string
+          reimbursement_status?: Database["public"]["Enums"]["reimbursement_status"]
           updated_at?: string
           user_id: string
         }
         Update: {
           amount?: number
-          category?: string | null
+          category_id?: string | null
           created_at?: string
           date?: string
           description?: string
           id?: string
+          installments?: number
+          is_recurring?: boolean
           person_id?: string
+          reimbursement_status?: Database["public"]["Enums"]["reimbursement_status"]
           updated_at?: string
           user_id?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "expenses_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "categories"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "expenses_person_id_fkey"
             columns: ["person_id"]
@@ -117,10 +163,13 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      cleanup_unverified_users: {
+        Args: Record<PropertyKey, never>
+        Returns: undefined
+      }
     }
     Enums: {
-      [_ in never]: never
+      reimbursement_status: "pending" | "reimbursed" | "not_applicable"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -247,6 +296,8 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      reimbursement_status: ["pending", "reimbursed", "not_applicable"],
+    },
   },
 } as const
