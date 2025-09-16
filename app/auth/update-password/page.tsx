@@ -48,7 +48,7 @@ function UpdatePasswordComponent() {
     if (error) {
       toast.error("Erro ao atualizar", {
         description:
-          "Não foi possível atualizar sua senha. O token pode ter expirado.",
+          "Não foi possível atualizar sua senha. A sessão de recuperação pode ter expirado.",
       });
     } else {
       toast.success("Senha atualizada!", {
