@@ -19,11 +19,12 @@ import {
 } from "@/components/ui/input-otp";
 import { Loader2 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
-import Link from "next/link";
+import { deleteUnverifiedUser } from "@/lib/auth/actions";
 
 function VerifyOtpPageContent() {
   const [otp, setOtp] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [isCancelling, setIsCancelling] = useState(false);
   const router = useRouter();
   const searchParams = useSearchParams();
   const { verifyOtp } = useAuth();
@@ -70,6 +71,20 @@ function VerifyOtpPageContent() {
     setIsLoading(false);
   };
 
+  const handleGoBack = async () => {
+    if (!email) {
+      router.push("/auth");
+      return;
+    }
+    setIsCancelling(true);
+    await deleteUnverifiedUser(email);
+    toast.info("Cadastro cancelado.", {
+      description: "Você pode usar este e-mail para se cadastrar novamente.",
+    });
+    router.push("/auth");
+    setIsCancelling(false);
+  };
+
   return (
     <div className="min-h-screen bg-background flex flex-col gap-6 items-center justify-center p-4">
       <Card className="w-full max-w-md">
@@ -107,9 +122,10 @@ function VerifyOtpPageContent() {
       </Card>
       <div className="flex flex-col items-center text-sm text-muted-foreground gap-1">
         <p>Digitou o Email errado?</p>
-        <Link href="/auth" className="text-primary">
-          <Button variant="link">Voltar</Button>
-        </Link>
+        <Button variant="link" onClick={handleGoBack} disabled={isCancelling}>
+          {isCancelling && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+          Voltar e cancelar
+        </Button>
       </div>
     </div>
   );
