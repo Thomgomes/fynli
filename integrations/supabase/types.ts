@@ -14,6 +14,57 @@ export type Database = {
   }
   public: {
     Tables: {
+      budgets: {
+        Row: {
+          amount: number
+          category_id: string | null
+          created_at: string
+          end_date: string
+          id: string
+          person_id: string | null
+          start_date: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          amount: number
+          category_id?: string | null
+          created_at?: string
+          end_date: string
+          id?: string
+          person_id?: string | null
+          start_date: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          amount?: number
+          category_id?: string | null
+          created_at?: string
+          end_date?: string
+          id?: string
+          person_id?: string | null
+          start_date?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "budgets_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "categories"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "budgets_person_id_fkey"
+            columns: ["person_id"]
+            isOneToOne: false
+            referencedRelation: "people"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       categories: {
         Row: {
           color: string | null
@@ -54,6 +105,7 @@ export type Database = {
           id: string
           installments: number
           is_recurring: boolean
+          payment_method: Database["public"]["Enums"]["payment_method"] | null
           person_id: string
           reimbursement_status: Database["public"]["Enums"]["reimbursement_status"]
           updated_at: string
@@ -68,6 +120,7 @@ export type Database = {
           id?: string
           installments?: number
           is_recurring?: boolean
+          payment_method?: Database["public"]["Enums"]["payment_method"] | null
           person_id: string
           reimbursement_status?: Database["public"]["Enums"]["reimbursement_status"]
           updated_at?: string
@@ -82,6 +135,7 @@ export type Database = {
           id?: string
           installments?: number
           is_recurring?: boolean
+          payment_method?: Database["public"]["Enums"]["payment_method"] | null
           person_id?: string
           reimbursement_status?: Database["public"]["Enums"]["reimbursement_status"]
           updated_at?: string
@@ -167,8 +221,30 @@ export type Database = {
         Args: Record<PropertyKey, never>
         Returns: undefined
       }
+      get_chart_data: {
+        Args: {
+          filter_month: number
+          filter_year: number
+          user_id_param: string
+        }
+        Returns: Json
+      }
+      get_dashboard_stats: {
+        Args: {
+          filter_month: number
+          filter_year: number
+          user_id_param: string
+        }
+        Returns: {
+          top_person_amount: number
+          top_person_name: string
+          total_all_time: number
+          total_selected_month: number
+        }[]
+      }
     }
     Enums: {
+      payment_method: "credit_card" | "debit_card" | "pix" | "cash" | "other"
       reimbursement_status: "pending" | "reimbursed" | "not_applicable"
     }
     CompositeTypes: {
@@ -297,6 +373,7 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
+      payment_method: ["credit_card", "debit_card", "pix", "cash", "other"],
       reimbursement_status: ["pending", "reimbursed", "not_applicable"],
     },
   },
