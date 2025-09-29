@@ -1,23 +1,22 @@
 "use client";
 
-import useSWR  from 'swr';
+import useSWR from 'swr';
 import { supabase } from '@/integrations/supabase/client';
-
+import { useAuth } from '@/contexts/AuthContext';
 import { Tables, TablesInsert, TablesUpdate } from '@/integrations/supabase/types';
 import { toast } from 'sonner';
-import { useAuth } from '@/contexts/AuthContext';
 
-export type Category = Pick<Tables<'categories'>, 'id' | 'name' | 'icon'>;
+// 1. REMOVEMOS O TIPO 'Category' customizado. Usaremos o tipo oficial 'Tables<'categories'>' diretamente.
 
-const fetcher = async (userId: string): Promise<Category[]> => {
+const fetcher = async (userId: string): Promise<Tables<'categories'>[]> => {
   const { data, error } = await supabase
     .from('categories')
-    .select('id, name, icon')
+    .select('*') // 2. CORRIGIDO: Buscamos TODAS as colunas com '*'
     .eq('user_id', userId)
     .order('name', { ascending: true });
 
   if (error) {
-    console.error("SWR Fetcher Error:", error);
+    console.error("SWR Fetcher Error (useCategories):", error);
     throw new Error(error.message);
   }
   
@@ -26,79 +25,40 @@ const fetcher = async (userId: string): Promise<Category[]> => {
 
 export function useCategories() {
   const { user } = useAuth();
-  const key = user ? user.id : null;
+  const key = user ? `categories-${user.id}` : null;
 
-  const { data: categories, error, isLoading, mutate: revalidate } = useSWR<Category[]>(
-    key ? `categories-${key}` : null, 
-    () => fetcher(key!),
+  // 3. CORRIGIDO: Usamos o tipo completo Tables<'categories'>[] aqui.
+  const { data: categories, error, isLoading, mutate: revalidate } = useSWR<Tables<'categories'>[]>(
+    key, 
+    () => fetcher(user!.id),
     {
       revalidateOnFocus: false,
-      revalidateOnReconnect: false,
     }
   );
-
-  const addCategory = async (name: string, icon: string) => {
-    if (!user || !key) return;
-    
-    // --- INÍCIO DA CORREÇÃO ---
-    // Adicionamos a tipagem explícita aqui para garantir que o objeto tenha a forma correta
-    const newCategoryOptimistic: Tables<'categories'> = {
-      id: `temp-${Math.random()}`, // ID temporário
-      created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString(),
-      user_id: user.id,
-      name,
-      icon,
-    };
-    // --- FIM DA CORREÇÃO ---
-
-    await revalidate((currentData = []) => [...currentData, newCategoryOptimistic], false);
-
-    const { data: newCategory, error } = await supabase
-      .from('categories')
-      .insert({ name, icon, user_id: user.id } as TablesInsert<'categories'>)
-      .select()
-      .single();
-
-    if (error) {
-      toast.error("Erro ao criar categoria", { description: error.message });
-      await revalidate(categories, false); // Reverte a UI em caso de erro
-      throw error;
-    }
-    
-    toast.success("Categoria criada com sucesso!");
-    await revalidate(); // Revalida para pegar os dados corretos do banco (incluindo o ID real)
-  };
   
+  const addCategory = async (name: string, icon?: string) => {
+    if (!user) return;
+    const newCategoryPayload: TablesInsert<'categories'> = { name, icon: icon || 'ShoppingCart', user_id: user.id };
+    const { error } = await supabase.from('categories').insert(newCategoryPayload);
+    if (error) { toast.error("Erro ao criar categoria", {description: error.message}); throw error; }
+    toast.success("Categoria criada com sucesso!");
+    revalidate();
+  };
+
   const updateCategory = async (id: string, updates: TablesUpdate<'categories'>) => {
-    if (!key) return;
-    await revalidate(categories?.map(c => c.id === id ? { ...c, ...updates } : c), false);
-
+    if (!user) return;
     const { error } = await supabase.from('categories').update(updates).eq('id', id);
-
-    if (error) {
-      toast.error("Erro ao atualizar categoria", { description: error.message });
-      await revalidate(categories, false);
-      throw error;
-    }
-
+    if (error) { toast.error("Erro ao atualizar categoria", {description: error.message}); throw error; }
     toast.success("Categoria atualizada!");
-    await revalidate();
+    revalidate();
   };
 
   const deleteCategory = async (id: string) => {
-    if (!key) return;
-    await revalidate(categories?.filter(c => c.id !== id), false);
-
+    if (!user) return;
     const { error } = await supabase.from('categories').delete().eq('id', id);
-
-    if (error) {
-      toast.error("Erro ao deletar categoria", { description: error.message });
-      await revalidate(categories, false);
-      throw error;
-    }
-    
+    if (error) { toast.error("Erro ao deletar categoria", {description: error.message}); throw error; }
     toast.success("Categoria deletada.");
+    revalidate();
   };
 
   return {
