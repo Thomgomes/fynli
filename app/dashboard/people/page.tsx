@@ -1,59 +1,28 @@
 "use client";
 
 import React, { useState } from "react";
-import { Formik, Form, Field, FormikHelpers } from 'formik';
-import * as Yup from 'yup';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Skeleton } from "@/components/ui/skeleton";
 import { MoreHorizontal, PlusCircle, Trash2, Edit } from "lucide-react";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Tables } from "@/integrations/supabase/types";
 import { usePeople } from "@/hooks/use-people"; 
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
-
-type PersonFormValues = {
-  name: string;
-  color: string;
-};
-
-const PersonSchema = Yup.object().shape({
-  name: Yup.string().min(2, 'Muito curto!').max(50, 'Muito longo!').required('O nome é obrigatório'),
-  color: Yup.string().matches(/^#[0-9A-F]{6}$/i, 'Cor em formato hexadecimal inválido (ex: #RRGGBB)').required('Obrigatório'),
-});
+import { PersonFormDialog } from "@/components/dashboard/dialog/peopleFormDialog"; 
 
 export default function PeoplePage() {
-  const { people, isLoading, addPerson, updatePerson, deletePerson } = usePeople();
+  const { people, isLoading, deletePerson } = usePeople();
   
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingPerson, setEditingPerson] = useState<Tables<'people'> | null>(null);
 
-  const handleFormSubmit = async (values: PersonFormValues, { setSubmitting, resetForm }: FormikHelpers<PersonFormValues>) => {
-    try {
-      if (editingPerson) {
-        await updatePerson(editingPerson.id, values);
-      } else {
-        await addPerson(values);
-      }
-      resetForm();
-      setIsModalOpen(false);
-      setEditingPerson(null);
-    } catch (error) {
-      console.error("Falha ao salvar perfil:", error);
-    } finally {
-      setSubmitting(false);
-    }
-  };
-
-  const openEditModal = (person: Tables<'people'>) => {
+  const handleEdit = (person: Tables<'people'>) => {
     setEditingPerson(person);
     setIsModalOpen(true);
   };
   
-  const openNewModal = () => {
+  const handleNew = () => {
     setEditingPerson(null);
     setIsModalOpen(true);
   };
@@ -65,7 +34,7 @@ export default function PeoplePage() {
           <h1 className="text-2xl font-bold">Gerenciar Perfis (Pessoas)</h1>
           <p className="text-muted-foreground">Adicione, edite ou remova os perfis de gastos.</p>
         </div>
-        <Button onClick={openNewModal} className="gap-2">
+        <Button onClick={handleNew} className="gap-2">
           <PlusCircle className="h-4 w-4" />
           Novo Perfil
         </Button>
@@ -92,7 +61,7 @@ export default function PeoplePage() {
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild><Button variant="ghost" size="icon" className="h-8 w-8"><MoreHorizontal className="h-4 w-4" /></Button></DropdownMenuTrigger>
                     <DropdownMenuContent align="end">
-                      <DropdownMenuItem onClick={() => openEditModal(person)} className="gap-2 cursor-pointer"><Edit className="h-4 w-4" /> Editar</DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => handleEdit(person)} className="gap-2 cursor-pointer"><Edit className="h-4 w-4" /> Editar</DropdownMenuItem>
                       <ConfirmDialog
                         title="Tem certeza que deseja deletar?"
                         description={`Esta ação não pode ser desfeita. Isso irá deletar permanentemente o perfil "${person.name}".`}
@@ -113,43 +82,12 @@ export default function PeoplePage() {
         </CardContent>
       </Card>
 
-      <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>{editingPerson ? 'Editar Perfil' : 'Criar Novo Perfil'}</DialogTitle>
-          </DialogHeader>
-          <Formik
-            initialValues={{
-              name: editingPerson?.name || '',
-              color: editingPerson?.color || '#3b82f6',
-            }}
-            validationSchema={PersonSchema}
-            onSubmit={handleFormSubmit}
-            enableReinitialize
-          >
-            {({ isSubmitting, errors, touched }) => (
-              <Form className="space-y-4">
-                <div className="space-y-2">
-                  <Label htmlFor="name">Nome do Perfil</Label>
-                  <Field as={Input} name="name" id="name" placeholder="Ex: Mãe, Viagem à Praia..." />
-                  {errors.name && touched.name ? <p className="text-sm text-destructive">{errors.name}</p> : null}
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="color">Cor de Destaque</Label>
-                  <Field as={Input} name="color" id="color" type="color" className="p-1 h-10 w-full" />
-                  {errors.color && touched.color ? <p className="text-sm text-destructive">{errors.color}</p> : null}
-                </div>
-                <DialogFooter>
-                  <Button type="button" variant="outline" onClick={() => { setIsModalOpen(false); setEditingPerson(null); }}>Cancelar</Button>
-                  <Button type="submit" disabled={isSubmitting}>
-                    {isSubmitting ? 'Salvando...' : 'Salvar Perfil'}
-                  </Button>
-                </DialogFooter>
-              </Form>
-            )}
-          </Formik>
-        </DialogContent>
-      </Dialog>
+      <PersonFormDialog
+        open={isModalOpen}
+        onOpenChange={setIsModalOpen}
+        editingPerson={editingPerson}
+        onSuccess={() => setEditingPerson(null)} // Limpa o estado de edição ao fechar
+      />
     </div>
   );
 }
