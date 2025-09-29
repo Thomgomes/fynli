@@ -1,0 +1,39 @@
+"use client";
+
+import useSWR from 'swr';
+import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/contexts/AuthContext';
+
+// Tipagem para a resposta da nossa nova função SQL
+export type FilterOption = {
+  year: number;
+  months: number[];
+};
+
+const fetcher = async (userId: string): Promise<FilterOption[]> => {
+  const { data, error } = await supabase.rpc('get_filter_options', { 
+    user_id_param: userId
+  });
+
+  if (error) {
+    console.error("SWR Fetcher Error (useFilterOptions):", error);
+    throw new Error(error.message);
+  }
+  
+  return (data as FilterOption[]) || [];
+};
+
+export function useFilterOptions() {
+  const { user } = useAuth();
+  const key = user ? ['filter_options', user.id] : null;
+
+  const { data, error, isLoading } = useSWR<FilterOption[]>(key, fetcher, {
+    revalidateOnFocus: false, // Esses dados não mudam com tanta frequência
+  });
+
+  return {
+    options: data,
+    isLoadingOptions: isLoading,
+    error,
+  };
+}

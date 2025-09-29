@@ -239,6 +239,10 @@ export type Database = {
           total_selected_month: number
         }[]
       }
+      get_filter_options: {
+        Args: { user_id_param: string }
+        Returns: Json
+      }
     }
     Enums: {
       payment_method: "credito" | "debito" | "pix" | "dinheiro" | "outro"
