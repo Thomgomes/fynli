@@ -2,18 +2,16 @@
 
 import useSWR from 'swr';
 import { supabase } from '@/integrations/supabase/client';
-
 import { Tables } from '@/integrations/supabase/types';
 import { useAuth } from '@/contexts/AuthContext';
 
 // 1. O TIPO FOI AJUSTADO: trocamos 'color' por 'icon'.
-export type ExpenseWithRelations = Pick<Tables<'expenses'>, 'id' | 'description' | 'amount' | 'date'> & {
+export type ExpenseWithRelations = Tables<'expenses'> & {
   people: Pick<Tables<'people'>, 'name'> | null;
-  categories: Pick<Tables<'categories'>, 'name' | 'icon'> | null; // <-- MUDANÇA AQUI
+  categories: Pick<Tables<'categories'>, 'name' | 'icon'> | null;
 };
 
-const fetcher = async (userId: string): Promise<ExpenseWithRelations[]> => {
-  // 2. A QUERY FOI AJUSTADA: selecionamos 'icon' em vez de 'color'.
+const fetcher = async ([_key, userId]: [string, string]): Promise<ExpenseWithRelations[]> => {
   const { data, error } = await supabase
     .from('expenses')
     .select(`
@@ -23,7 +21,7 @@ const fetcher = async (userId: string): Promise<ExpenseWithRelations[]> => {
       date,
       people ( name ),
       categories ( name, icon ) 
-    `) // <-- MUDANÇA AQUI
+    `)
     .eq('user_id', userId)
     .order('date', { ascending: false })
     .order('created_at', { ascending: false })
@@ -33,12 +31,12 @@ const fetcher = async (userId: string): Promise<ExpenseWithRelations[]> => {
     throw new Error(error.message);
   }
   
-  return data as ExpenseWithRelations[] || [];
+  return (data as ExpenseWithRelations[]) || [];
 };
 
 export function useRecentTransactions() {
   const { user } = useAuth();
-  const key = user ? `recent-transactions-${user.id}` : null;
+  const key = user ? ['recent_transactions', user.id] : null;
 
   const { data, error, isLoading } = useSWR<ExpenseWithRelations[]>(key, fetcher);
 

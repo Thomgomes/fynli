@@ -39,7 +39,6 @@ interface AddExpenseModalProps {
   onExpenseAdded?: () => void;
 }
 
-// 1. Schema de Validação robusto com Yup
 const ExpenseSchema = Yup.object().shape({
   description: Yup.string()
     .min(3, "A descrição deve ter pelo menos 3 caracteres.")
@@ -52,7 +51,7 @@ const ExpenseSchema = Yup.object().shape({
   person_id: Yup.string().required("Selecione um perfil."),
   category_id: Yup.string().required("Selecione uma categoria."),
   payment_method: Yup.string()
-    .oneOf(["credit_card", "debit_card", "pix", "cash", "other"])
+    .oneOf(["credito", "debito", "pix", "dinheiro", "outro"])
     .required("Obrigatório"),
   reimbursement_status: Yup.string()
     .oneOf(["pending", "reimbursed", "not_applicable"])
@@ -64,14 +63,13 @@ const ExpenseSchema = Yup.object().shape({
     .required("Obrigatório"),
 });
 
-// Tipagem para os valores do formulário
 interface ExpenseFormValues {
   description: string;
   amount: number | "";
   date: string;
   person_id: string;
   category_id: string;
-  payment_method: "credit_card" | "debit_card" | "pix" | "cash" | "other";
+  payment_method: "credito" | "debito" | "pix" | "dinheiro" | "outro";
   reimbursement_status: "pending" | "reimbursed" | "not_applicable";
   installments: number;
 }
@@ -82,7 +80,6 @@ export function AddExpenseModal({
   onExpenseAdded,
 }: AddExpenseModalProps) {
   const { user } = useAuth();
-  // 2. Usando nossos hooks com SWR para buscar os dados dos seletores
   const { people } = usePeople();
   const { categories } = useCategories();
 
@@ -101,7 +98,6 @@ export function AddExpenseModal({
         values.installments > 1 ? values.installments : 1;
       const installmentAmount = (values.amount as number) / totalInstallments;
 
-      // 3. Lógica de parcelamento que planejamos
       for (let i = 0; i < totalInstallments; i++) {
         const expenseDate = new Date(values.date);
         expenseDate.setUTCMonth(expenseDate.getUTCMonth() + i);
@@ -157,7 +153,7 @@ export function AddExpenseModal({
               date: new Date().toISOString().split("T")[0],
               person_id: "",
               category_id: "",
-              payment_method: "credit_card",
+              payment_method: "credito",
               reimbursement_status: "not_applicable",
               installments: 1,
             }}
@@ -227,7 +223,6 @@ export function AddExpenseModal({
                               </SelectItem>
                             ))}
                             <SelectSeparator />
-                            {/* 3. Opção de "Adicionar Novo" */}
                             <div
                               className="flex items-center gap-2 p-2 cursor-pointer text-sm text-primary hover:bg-muted"
                               onMouseDown={(e) => {
@@ -268,7 +263,6 @@ export function AddExpenseModal({
                               </SelectItem>
                             ))}
                             <SelectSeparator />
-                            {/* 3. Opção de "Adicionar Novo" */}
                             <div
                               className="flex items-center gap-2 p-2 cursor-pointer text-sm text-primary hover:bg-muted"
                               onMouseDown={(e) => {
@@ -306,15 +300,11 @@ export function AddExpenseModal({
                             <SelectValue placeholder="Selecione..." />
                           </SelectTrigger>
                           <SelectContent>
-                            <SelectItem value="credit_card">
-                              Cartão de Crédito
-                            </SelectItem>
-                            <SelectItem value="debit_card">
-                              Cartão de Débito
-                            </SelectItem>
+                            <SelectItem value="credito">Crédito</SelectItem>
+                            <SelectItem value="debito">Débito</SelectItem>
                             <SelectItem value="pix">Pix</SelectItem>
-                            <SelectItem value="cash">Dinheiro</SelectItem>
-                            <SelectItem value="other">Outro</SelectItem>
+                            <SelectItem value="dinheiro">Dinheiro</SelectItem>
+                            <SelectItem value="outro">Outro</SelectItem>
                           </SelectContent>
                         </Select>
                       )}

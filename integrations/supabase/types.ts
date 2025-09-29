@@ -241,7 +241,7 @@ export type Database = {
       }
     }
     Enums: {
-      payment_method: "credit_card" | "debit_card" | "pix" | "cash" | "other"
+      payment_method: "credito" | "debito" | "pix" | "dinheiro" | "outro"
       reimbursement_status: "pending" | "reimbursed" | "not_applicable"
     }
     CompositeTypes: {
@@ -370,7 +370,7 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
-      payment_method: ["credit_card", "debit_card", "pix", "cash", "other"],
+      payment_method: ["credito", "debito", "pix", "dinheiro", "outro"],
       reimbursement_status: ["pending", "reimbursed", "not_applicable"],
     },
   },

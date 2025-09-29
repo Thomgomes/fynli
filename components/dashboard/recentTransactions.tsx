@@ -8,8 +8,14 @@ import { ArrowRight } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useRecentTransactions } from "@/hooks/use-recent-transactions";
 
+const paymentMethodLabels = {
+  credito: 'Crédito',
+  debito: 'Débito',
+  pix: 'Pix',
+  dinheiro: 'Dinheiro',
+  outro: 'Outro',
+};
 
-// Componente de esqueleto para o estado de carregamento
 function TransactionSkeleton() {
   return (
     <div className="flex items-center justify-between p-3">
@@ -23,7 +29,6 @@ function TransactionSkeleton() {
 }
 
 export function RecentTransactions() {
-  // 2. Lógica de dados substituída por uma única linha!
   const { transactions, isLoading, error } = useRecentTransactions();
 
   const formatCurrency = (value: number) => {
@@ -59,7 +64,7 @@ export function RecentTransactions() {
               <div className="flex-1">
                 <p className="font-semibold text-foreground truncate">{expense.description}</p>
                 <p className="text-sm text-muted-foreground">
-                  {expense.people?.name || 'Desconhecido'} • {new Date(expense.date).toLocaleDateString("pt-BR", { timeZone: 'UTC' })}
+                  {expense.people?.name || 'Desconhecido'} • {paymentMethodLabels[expense.payment_method as keyof typeof paymentMethodLabels] || 'N/A'} • {new Date(expense.date).toLocaleDateString("pt-BR", { timeZone: 'UTC' })}
                 </p>
               </div>
             </div>
