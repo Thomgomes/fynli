@@ -52,11 +52,6 @@ export default function CategoriesPage() {
     }
   };
 
-  const handleDelete = async (categoryId: string) => {
-    if (!window.confirm("Tem certeza que deseja deletar esta categoria? Esta ação não pode ser desfeita.")) return;
-    await deleteCategory(categoryId);
-  };
-
   const openEditModal = (category: Tables<'categories'>) => {
     setEditingCategory(category);
     setIsModalOpen(true);
