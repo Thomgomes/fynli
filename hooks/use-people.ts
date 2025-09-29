@@ -6,10 +6,12 @@ import { useAuth } from '@/contexts/AuthContext';
 import { Tables, TablesInsert, TablesUpdate } from '@/integrations/supabase/types';
 import { toast } from 'sonner';
 
-const fetcher = async ([_key, userId]: [string, string]): Promise<Tables<'people'>[]> => {
+export type Person = Pick<Tables<'people'>, 'id' | 'name' | 'color'>;
+
+const fetcher = async ([_key, userId]: [string, string]): Promise<Person[]> => {
   const { data, error } = await supabase
     .from('people')
-    .select('*')
+    .select('id, name, color')
     .eq('user_id', userId)
     .order('name', { ascending: true });
 
@@ -26,7 +28,7 @@ export function usePeople() {
   
   const key = user ? ['people', user.id] : null;
 
-  const { data: people, error, isLoading, mutate } = useSWR<Tables<'people'>[]>(
+  const { data: people, error, isLoading, mutate } = useSWR<Person[]>(
     key, 
     fetcher,
     {

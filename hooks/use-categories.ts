@@ -7,10 +7,12 @@ import { Tables, TablesInsert, TablesUpdate } from '@/integrations/supabase/type
 import { toast } from 'sonner';
 import { useAuth } from '@/contexts/AuthContext';
 
-const fetcher = async (userId: string): Promise<Tables<'categories'>[]> => {
+export type Category = Pick<Tables<'categories'>, 'id' | 'name' | 'icon'>;
+
+const fetcher = async (userId: string): Promise<Category[]> => {
   const { data, error } = await supabase
     .from('categories')
-    .select('*')
+    .select('id, name, icon')
     .eq('user_id', userId)
     .order('name', { ascending: true });
 
@@ -26,9 +28,9 @@ export function useCategories() {
   const { user } = useAuth();
   const key = user ? user.id : null;
 
-  const { data: categories, error, isLoading, mutate: revalidate } = useSWR<Tables<'categories'>[]>(
-    key, 
-    fetcher,
+  const { data: categories, error, isLoading, mutate: revalidate } = useSWR<Category[]>(
+    key ? `categories-${key}` : null, 
+    () => fetcher(key!),
     {
       revalidateOnFocus: false,
       revalidateOnReconnect: false,

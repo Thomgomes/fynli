@@ -3,7 +3,8 @@
 import useSWR from 'swr';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
-import { Tables } from '@/integrations/supabase/types';
+import { Tables, TablesUpdate } from '@/integrations/supabase/types';
+import { toast } from 'sonner';
 
 // Tipo para os filtros que podemos aplicar
 export interface TransactionFilters {
@@ -25,8 +26,8 @@ export interface TransactionsResponse {
 }
 
 export type ExpenseWithRelations = Tables<'expenses'> & {
-  people: Pick<Tables<'people'>, 'name'> | null;
-  categories: Pick<Tables<'categories'>, 'name' | 'icon'> | null;
+  people: Pick<Tables<'people'>, 'id' | 'name'> | null;
+  categories: Pick<Tables<'categories'>, 'id' | 'name' | 'icon'> | null;
 };
 
 const fetcher = async ([_key, userId, filters, pagination]: [string, string, TransactionFilters, PaginationState]): Promise<TransactionsResponse> => {
@@ -39,8 +40,8 @@ const fetcher = async ([_key, userId, filters, pagination]: [string, string, Tra
       date,
       payment_method,
       reimbursement_status,
-      people ( name ),
-      categories ( name, icon )
+      people ( id, name ),
+      categories ( id, name, icon )
     `, { count: 'exact' }) // 'exact' nos dá a contagem total de itens que correspondem aos filtros
     .eq('user_id', userId);
 
@@ -87,10 +88,32 @@ export function useTransactions(filters: TransactionFilters, pagination: Paginat
     keepPreviousData: true, // Importante para uma boa UX de paginação
   });
 
+  const deleteTransaction = async (id: string) => {
+    const { error } = await supabase.from('expenses').delete().eq('id', id);
+    if (error) {
+      toast.error("Erro ao deletar transação", { description: error.message });
+      throw error;
+    }
+    toast.success("Transação deletada com sucesso.");
+    mutate(); // Revalida os dados para atualizar a tabela
+  };
+  
+  const updateTransaction = async (id: string, updates: TablesUpdate<'expenses'>) => {
+    const { error } = await supabase.from('expenses').update(updates).eq('id', id);
+     if (error) {
+      toast.error("Erro ao atualizar transação", { description: error.message });
+      throw error;
+    }
+    toast.success("Transação atualizada com sucesso.");
+    mutate();
+  };
+
   return {
     data: data,
     isLoading,
     error,
     mutate,
+    deleteTransaction,
+    updateTransaction,
   };
 }
