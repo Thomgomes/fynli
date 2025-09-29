@@ -1,9 +1,10 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import useSWR from 'swr';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
-import { Tables, TablesUpdate } from '@/integrations/supabase/types';
+import { Tables, TablesInsert, TablesUpdate } from '@/integrations/supabase/types';
 import { toast } from 'sonner';
 
 // Tipo para os filtros que podemos aplicar
@@ -88,6 +89,39 @@ export function useTransactions(filters: TransactionFilters, pagination: Paginat
     keepPreviousData: true, // Importante para uma boa UX de paginação
   });
 
+  const addTransaction = async (values: any) => {
+    if (!user) throw new Error("Usuário não autenticado.");
+
+    const expensesToInsert: TablesInsert<'expenses'>[] = [];
+    const totalInstallments = values.installments > 1 ? values.installments : 1;
+    const installmentAmount = (values.amount as number) / totalInstallments;
+
+    for (let i = 0; i < totalInstallments; i++) {
+      const expenseDate = new Date(values.date);
+      expenseDate.setUTCMonth(expenseDate.getUTCMonth() + i);
+      expensesToInsert.push({
+        user_id: user.id,
+        person_id: values.person_id,
+        category_id: values.category_id,
+        description: totalInstallments > 1 ? `${values.description} (${i + 1}/${totalInstallments})` : values.description,
+        amount: installmentAmount,
+        date: expenseDate.toISOString().split('T')[0],
+        payment_method: values.payment_method,
+        reimbursement_status: values.reimbursement_status,
+        installments: totalInstallments,
+      });
+    }
+
+    const { error: insertError } = await supabase.from('expenses').insert(expensesToInsert);
+    if (insertError) {
+      toast.error("Erro ao adicionar despesa", { description: insertError.message });
+      throw insertError;
+    }
+
+    toast.success("Despesa adicionada com sucesso!");
+    mutate(); // Revalida os dados desta tabela
+  };
+
   const deleteTransaction = async (id: string) => {
     const { error } = await supabase.from('expenses').delete().eq('id', id);
     if (error) {
@@ -113,6 +147,7 @@ export function useTransactions(filters: TransactionFilters, pagination: Paginat
     isLoading,
     error,
     mutate,
+    addTransaction,
     deleteTransaction,
     updateTransaction,
   };

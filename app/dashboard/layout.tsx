@@ -3,7 +3,8 @@
 import { AddExpenseModal } from "@/components/dashboard/addExpanseModal";
 import { DashboardHeader } from "@/components/dashboard/header";
 import { DashboardSidebar } from "@/components/dashboard/sidebar";
-import { cloneElement, ReactElement, useState } from "react";
+import { useState } from "react";
+import { useSWRConfig } from "swr";
 
 
 export default function DashboardLayout({
@@ -12,11 +13,17 @@ export default function DashboardLayout({
   children: React.ReactNode;
 }) {
   const [isAddExpenseOpen, setIsAddExpenseOpen] = useState(false);
-  const [refreshKey, setRefreshKey] = useState(0);
+  const { mutate } = useSWRConfig(); 
 
-  const handleExpenseAdded = () => {
-    setRefreshKey((prev) => prev + 1); // Força a atualização dos componentes que usam essa chave
-    setIsAddExpenseOpen(false);
+  const handleSuccess = () => {
+    // Dizemos para a SWR buscar novamente os dados de todas as chaves que começam com 'dashboard_stats'
+    mutate((key) => Array.isArray(key) && key[0] === 'dashboard_stats');
+    
+    // E também para as chaves que começam com 'recent_transactions'
+    mutate((key) => Array.isArray(key) && key[0] === 'recent_transactions');
+    
+    // E também para a tabela principal de transações
+    mutate((key) => Array.isArray(key) && key[0] === 'transactions');
   };
 
   return (
@@ -28,7 +35,7 @@ export default function DashboardLayout({
           <DashboardHeader onAddExpenseClick={() => setIsAddExpenseOpen(true)} />
           <main className="flex-1 p-4 sm:p-6">
             {/* 2. Usamos React.cloneElement para passar a refreshKey para os filhos (a página) */}
-            {cloneElement(children as ReactElement, { key: refreshKey })}
+            {children}
           </main>
         </div>
       </div>
@@ -37,7 +44,8 @@ export default function DashboardLayout({
       <AddExpenseModal
         open={isAddExpenseOpen}
         onOpenChange={setIsAddExpenseOpen}
-        onExpenseAdded={handleExpenseAdded}
+        onSuccess={handleSuccess}
+        editingExpense={null} // Passamos null pois este botão é apenas para CRIAR
       />
     </>
   );

@@ -8,11 +8,9 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue, SelectSeparator } from "@/components/ui/select";
 import { useAuth } from "@/contexts/AuthContext";
-import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Formik, Form, Field, FormikHelpers } from 'formik';
 import * as Yup from 'yup';
-import { TablesInsert } from "@/integrations/supabase/types";
 import { usePeople } from "@/hooks/use-people";
 import { useCategories } from "@/hooks/use-categories";
 import { Loader2, PlusCircle } from "lucide-react";
@@ -47,53 +45,35 @@ interface ExpenseFormValues {
 }
 
 export function AddExpenseModal({ open, onOpenChange, onSuccess, editingExpense }: AddExpenseModalProps) {
-  const { user } = useAuth();
   const { people } = usePeople();
   const { categories } = useCategories();
-  const { updateTransaction } = useTransactions({}, { pageIndex: 0, pageSize: 10 }); // Apenas para ter a função de update
+  const { addTransaction, updateTransaction } = useTransactions({}, { pageIndex: 0, pageSize: 10 }); // Apenas para ter a função de update
   
   const [isCreatingPerson, setIsCreatingPerson] = useState(false);
   const [isCreatingCategory, setIsCreatingCategory] = useState(false);
 
   const handleSubmit = async (values: ExpenseFormValues, { setSubmitting, resetForm }: FormikHelpers<ExpenseFormValues>) => {
-    if (!user) return;
     try {
       if (editingExpense) {
-        // MODO DE EDIÇÃO
         await updateTransaction(editingExpense.id, {
-            description: values.description,
-            amount: values.amount as number,
-            date: values.date,
-            person_id: values.person_id,
-            category_id: values.category_id,
-            payment_method: values.payment_method,
-            reimbursement_status: values.reimbursement_status,
+          description: values.description,
+          amount: values.amount as number,
+          date: values.date,
+          person_id: values.person_id,
+          category_id: values.category_id,
+          payment_method: values.payment_method,
+          reimbursement_status: values.reimbursement_status,
         });
       } else {
-        // MODO DE CRIAÇÃO
-        const expensesToInsert: TablesInsert<'expenses'>[] = [];
-        const totalInstallments = values.installments;
-        const installmentAmount = (values.amount as number) / totalInstallments;
-        for (let i = 0; i < totalInstallments; i++) {
-          const expenseDate = new Date(values.date);
-          expenseDate.setUTCMonth(expenseDate.getUTCMonth() + i);
-          expensesToInsert.push({
-            user_id: user.id, person_id: values.person_id, category_id: values.category_id,
-            description: totalInstallments > 1 ? `${values.description} (${i + 1}/${totalInstallments})` : values.description,
-            amount: installmentAmount, date: expenseDate.toISOString().split('T')[0],
-            payment_method: values.payment_method, reimbursement_status: values.reimbursement_status,
-            installments: totalInstallments,
-          });
-        }
-        const { error } = await supabase.from('expenses').insert(expensesToInsert);
-        if (error) throw error;
+        await addTransaction(values);
       }
       toast.success(`Gasto ${editingExpense ? 'atualizado' : 'adicionado'} com sucesso!`);
       resetForm();
       onOpenChange(false);
       onSuccess?.();
     } catch (error: any) {
-      toast.error(`Erro ao salvar despesa`, { description: error.message });
+      // O hook já mostra o toast de erro, apenas logamos aqui
+      console.error("Falha ao salvar despesa", error);
     } finally {
       setSubmitting(false);
     }
@@ -105,17 +85,15 @@ export function AddExpenseModal({ open, onOpenChange, onSuccess, editingExpense 
         <DialogContent className="sm:max-w-lg">
           <DialogHeader>
             <DialogTitle>{editingExpense ? 'Editar Gasto' : 'Adicionar Novo Gasto'}</DialogTitle>
-            <DialogDescription>
-              {editingExpense ? 'Ajuste os detalhes da sua despesa.' : 'Registre uma nova despesa detalhadamente.'}
-            </DialogDescription>
+            <DialogDescription>{editingExpense ? 'Ajuste os detalhes da sua despesa.' : 'Registre uma nova despesa detalhadamente.'}</DialogDescription>
           </DialogHeader>
           <Formik
             initialValues={{
               description: editingExpense?.description || '',
               amount: editingExpense?.amount || '',
-              date: editingExpense ? editingExpense.date.split('T')[0] : new Date().toISOString().split('T')[0],
-              person_id: editingExpense?.people?.id || '',
-              category_id: editingExpense?.categories?.id || '',
+              date: editingExpense ? new Date(editingExpense.date).toISOString().split('T')[0] : new Date().toISOString().split('T')[0],
+              person_id: editingExpense?.person_id || '',
+              category_id: editingExpense?.category_id || '',
               payment_method: editingExpense?.payment_method || 'credito',
               reimbursement_status: editingExpense?.reimbursement_status || 'not_applicable',
               installments: editingExpense?.installments || 1,
