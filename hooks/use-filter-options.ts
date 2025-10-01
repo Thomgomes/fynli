@@ -10,7 +10,7 @@ export type FilterOption = {
   months: number[];
 };
 
-const fetcher = async (userId: string): Promise<FilterOption[]> => {
+const fetcher = async ([_key, userId]: [string, string]): Promise<FilterOption[]> => {
   const { data, error } = await supabase.rpc('get_filter_options', { 
     user_id_param: userId
   });

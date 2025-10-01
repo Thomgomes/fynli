@@ -25,8 +25,8 @@ export default function TransactionsPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingExpense, setEditingExpense] = useState<ExpenseWithRelations | null>(null);
 
-  const [selectedYear, setSelectedYear] = useState<string>('todos');
-  const [selectedMonth, setSelectedMonth] = useState<string>('todos');
+  const [selectedYear, setSelectedYear] = useState<string>(new Date().getFullYear().toString());
+  const [selectedMonth, setSelectedMonth] = useState<string>((new Date().getMonth() + 1).toString());
 
   // 1. Corrigido: Chamada ÚNICA ao hook useTransactions para buscar todos os dados e funções.
   const { data, isLoading, deleteTransaction } = useTransactions(filters, pagination);
