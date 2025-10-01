@@ -93,6 +93,7 @@ export default function CategoriesPage() {
                         {IconComponent && (
                           <IconComponent className="h-5 w-5 text-muted-foreground" />
                         )}
+                        <div className="h-6 w-6 rounded-full" style={{ backgroundColor: cat.color || '#ccc' }} />
                         <span className="font-medium">{cat.name}</span>
                       </div>
                       {isGlobal && (
