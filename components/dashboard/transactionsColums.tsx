@@ -28,7 +28,6 @@ import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 const statusLabels: Record<string, { label: string; className: string }> = {
   pending: { label: "Pendente", className: "bg-amber-500/20 text-amber-700 border-amber-500/30" },
   reimbursed: { label: "Reembolsado", className: "bg-green-500/20 text-green-700 border-green-500/30" },
-  not_applicable: { label: "N/A", className: "bg-muted text-muted-foreground" },
 };
 
 const paymentMethodMap: Record<string, { label: string; icon: React.ElementType }> = {
@@ -109,7 +108,7 @@ export const getColumns = ({
     header: "Reembolso",
     cell: ({ row }) => {
       const status = row.original.reimbursement_status;
-      const { label, className } = statusLabels[status] || statusLabels.not_applicable;
+      const { label, className } = statusLabels[status];
       return <Badge variant="outline" className={className}>{label}</Badge>;
     },
   },
