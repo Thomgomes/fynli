@@ -6,12 +6,11 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Label } from "@/components/ui/label";
-import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend, ArcElement, Filler } from 'chart.js';
-import { Line, Doughnut } from 'react-chartjs-2';
+import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend, ArcElement } from 'chart.js';
+import { Bar, Doughnut } from 'react-chartjs-2';
 import { useChartData } from "@/hooks/use-chart-data";
 
-
-ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend, ArcElement, Filler);
+ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend, ArcElement);
 
 function ChartSkeleton() {
   return (
@@ -38,7 +37,6 @@ export function DashboardCharts() {
   const [selectedYear, setSelectedYear] = useState(currentYear);
   const [selectedMonth, setSelectedMonth] = useState("todos");
 
-  // 2. A lógica de fetch foi substituída por uma única chamada ao nosso hook
   const { chartData, isLoading, error } = useChartData({
     year: parseInt(selectedYear),
     month: selectedMonth === 'todos' ? 0 : parseInt(selectedMonth),
@@ -55,32 +53,30 @@ export function DashboardCharts() {
     { value: "12", label: "Dezembro" },
   ];
   
-  // A lógica de processamento continua aqui, usando 'useMemo' para performance
-  const lineChartData = useMemo(() => {
+  const barChartData = useMemo(() => {
     if (!chartData) return { labels: [], datasets: [] };
-    
-    const monthNames = ["Jan", "Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago", "Set", "Out", "Nov", "Dez"];
-    const monthlyTotals = new Array(12).fill(0);
-    chartData.monthly_expenses.forEach(item => {
-        monthlyTotals[item.month - 1] = item.total;
-    });
 
-    return {
-      labels: monthNames,
-      datasets: [{
-        label: 'Total de Gastos',
-        data: monthlyTotals,
-        borderColor: 'hsl(var(--primary))',
-        backgroundColor: 'hsl(var(--primary) / 0.1)',
-        fill: true,
-        tension: 0.4,
-      }],
-    };
-  }, [chartData]);
+    if (selectedMonth === 'todos') {
+      const monthNames = ["Jan", "Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago", "Set", "Out", "Nov", "Dez"];
+      const monthlyTotals = new Array(12).fill(0);
+      chartData.monthly_expenses.forEach(item => {
+          monthlyTotals[item.month - 1] = item.total;
+      });
+      return {
+        labels: monthNames,
+        datasets: [{ label: 'Gasto Mensal', data: monthlyTotals, backgroundColor: 'hsl(var(--primary) / 0.7)' }],
+      };
+    } else {
+      const categoryData = chartData.category_distribution_for_month;
+      return {
+        labels: categoryData.map(c => c.name),
+        datasets: [{ label: 'Gasto na Categoria', data: categoryData.map(c => c.total), backgroundColor: 'hsl(var(--primary) / 0.7)' }],
+      }
+    }
+  }, [chartData, selectedMonth]);
   
   const doughnutChartData = useMemo(() => {
     if (!chartData) return { labels: [], datasets: [] };
-
     return {
       labels: chartData.profile_distribution.map(p => p.name),
       datasets: [{
@@ -117,7 +113,7 @@ export function DashboardCharts() {
   };
 
   if (isLoading) return <ChartSkeleton />;
-  if (error) return <div className="text-destructive">Erro ao carregar os gráficos.</div>;
+  if (error) return <div className="text-destructive p-4 border border-destructive/50 bg-destructive/10 rounded-md">Erro ao carregar os gráficos. Por favor, tente recarregar a página.</div>;
 
   return (
     <div className="space-y-6">
@@ -144,11 +140,14 @@ export function DashboardCharts() {
       <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
         <Card className="lg:col-span-3">
           <CardHeader>
-            <CardTitle>Evolução Anual de Gastos</CardTitle>
-            <CardDescription>Total de despesas registradas por mês em {selectedYear}.</CardDescription>
+            <CardTitle>{selectedMonth === 'todos' ? `Evolução de Gastos em ${selectedYear}` : `Gastos por Categoria em ${months.find(m => m.value === selectedMonth)?.label}`}</CardTitle>
+            <CardDescription>
+              {selectedMonth === 'todos' ? 'Total de despesas registradas por mês.' : 'Soma de todas as despesas por categoria no mês selecionado.'}
+            </CardDescription>
           </CardHeader>
           <CardContent className="h-[300px] p-2">
-            <Line data={lineChartData} options={chartOptions} />
+            {/* --- AQUI ESTÁ A CORREÇÃO --- */}
+            <Bar data={barChartData} options={chartOptions} />
           </CardContent>
         </Card>
         <Card className="lg:col-span-2">
