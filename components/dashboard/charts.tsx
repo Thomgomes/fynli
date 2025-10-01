@@ -12,6 +12,11 @@ import { useChartData } from "@/hooks/use-chart-data";
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend, ArcElement);
 
+const getThemeColor = (variableName: string): string => {
+  if (typeof window === 'undefined') return '#000000';
+  return getComputedStyle(document.documentElement).getPropertyValue(variableName).trim();
+};
+
 function ChartSkeleton() {
   return (
     <div className="space-y-6">
@@ -53,6 +58,11 @@ export function DashboardCharts() {
     { value: "12", label: "Dezembro" },
   ];
   
+  const monthColors = [
+  '#3b82f6', '#16a34a', '#f97316', '#ef4444', '#8b5cf6', '#ec4899',
+  '#f59e0b', '#10b981', '#6366f1', '#d946ef', '#0ea5e9', '#e11d48'
+];
+
   const barChartData = useMemo(() => {
     if (!chartData) return { labels: [], datasets: [] };
 
@@ -64,7 +74,7 @@ export function DashboardCharts() {
       });
       return {
         labels: monthNames,
-        datasets: [{ label: 'Gasto Mensal', data: monthlyTotals, backgroundColor: 'hsl(var(--primary) / 0.7)' }],
+        datasets: [{ label: 'Gasto Mensal', data: monthlyTotals, backgroundColor: monthColors }],
       };
     } else {
       const categoryData = chartData.category_distribution_for_month;
@@ -82,7 +92,7 @@ export function DashboardCharts() {
       datasets: [{
         data: chartData.profile_distribution.map(p => p.total),
         backgroundColor: chartData.profile_distribution.map(p => p.color || '#cccccc'),
-        borderColor: 'hsl(var(--background))',
+        borderColor: getThemeColor('--background'),
         borderWidth: 2,
       }],
     };
@@ -96,19 +106,19 @@ export function DashboardCharts() {
     plugins: {
       legend: { display: false },
       tooltip: {
-        backgroundColor: 'hsl(var(--card))',
-        borderColor: 'hsl(var(--border))',
+        backgroundColor: getThemeColor('--chart-card'),
+        borderColor: getThemeColor('--chart-border'),
         borderWidth: 1,
-        titleColor: 'hsl(var(--foreground))',
-        bodyColor: 'hsl(var(--foreground))',
+        titleColor: getThemeColor('--chart-foreground'),
+        bodyColor: getThemeColor('--chart-foreground'),
         callbacks: {
           label: (context: any) => `${context.dataset.label || context.label}: ${formatCurrency(context.parsed.y || context.parsed)}`
         }
       }
     },
     scales: {
-      x: { ticks: { color: 'hsl(var(--muted-foreground))' }, grid: { color: 'hsl(var(--border))' } },
-      y: { ticks: { color: 'hsl(var(--muted-foreground))', callback: (value: any) => formatCurrency(value) }, grid: { color: 'hsl(var(--border))' } }
+      x: { ticks: { color: getThemeColor('--muted-foreground') }, grid: { color: getThemeColor('--chart-border') } },
+      y: { ticks: { color: getThemeColor('--muted-foreground'), callback: (value: any) => formatCurrency(value) }, grid: { color: getThemeColor('--chart-border') } }
     }
   };
 
