@@ -24,11 +24,13 @@ interface CategoryFormDialogProps {
 type CategoryFormValues = {
   name: string;
   icon: string;
+  color: string;
 };
 
 const CategorySchema = Yup.object().shape({
   name: Yup.string().min(2, 'Muito curto!').max(50, 'Muito longo!').required('O nome é obrigatório'),
   icon: Yup.string().required('Selecione um ícone'),
+  color: Yup.string().matches(/^#[0-9A-F]{6}$/i, 'Cor inválida').required('Obrigatório'),
 });
 
 export function CategoryFormDialog({ open, onOpenChange, editingCategory, onSuccess }: CategoryFormDialogProps) {
@@ -39,7 +41,7 @@ export function CategoryFormDialog({ open, onOpenChange, editingCategory, onSucc
       if (editingCategory) {
         await updateCategory(editingCategory.id, values);
       } else {
-        await addCategory(values.name, values.icon);
+        await addCategory(values.name, values.icon, values.color);
       }
       resetForm();
       onOpenChange(false);
@@ -61,6 +63,7 @@ export function CategoryFormDialog({ open, onOpenChange, editingCategory, onSucc
           initialValues={{
             name: editingCategory?.name || '',
             icon: editingCategory?.icon || 'ShoppingCart',
+            color: editingCategory?.color || '#3b82f6',
           }}
           validationSchema={CategorySchema}
           onSubmit={handleFormSubmit}
@@ -93,6 +96,11 @@ export function CategoryFormDialog({ open, onOpenChange, editingCategory, onSucc
                   )}
                 </Field>
                 {errors.icon && touched.icon ? <p className="text-sm text-destructive">{errors.icon}</p> : null}
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="color">Cor</Label>
+                <Field as={Input} name="color" id="color" type="color" className="p-1 h-10 w-full" />
+                {errors.color && touched.color ? <p className="text-sm text-destructive">{errors.color}</p> : null}
               </div>
               <DialogFooter>
                 <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>Cancelar</Button>

@@ -70,7 +70,7 @@ export function DashboardCharts() {
       const categoryData = chartData.category_distribution_for_month;
       return {
         labels: categoryData.map(c => c.name),
-        datasets: [{ label: 'Gasto na Categoria', data: categoryData.map(c => c.total), backgroundColor: 'hsl(var(--primary) / 0.7)' }],
+        datasets: [{ label: 'Gasto na Categoria', data: categoryData.map(c => c.total), backgroundColor: categoryData.map(c => c.color || '#94a3b8'), }],
       }
     }
   }, [chartData, selectedMonth]);

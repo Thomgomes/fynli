@@ -8,7 +8,7 @@ import { useAuth } from "@/contexts/AuthContext";
 export type ChartDataResponse = {
   monthly_expenses: { month: number; total: number }[];
   profile_distribution: { name: string; total: number; color: string }[];
-  category_distribution_for_month: { name: string; total: number }[];
+  category_distribution_for_month: { name: string; total: number; color: string | null }[];
 };
 
 // O "fetcher" para a SWR. Ele recebe a chave (key) e busca os dados.

@@ -24,6 +24,8 @@ export default function DashboardLayout({
     
     // E também para a tabela principal de transações
     mutate((key) => Array.isArray(key) && key[0] === 'transactions');
+
+    mutate((key) => Array.isArray(key) && key[0] === 'chart_data');
   };
 
   return (

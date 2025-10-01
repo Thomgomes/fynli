@@ -36,9 +36,9 @@ export function useCategories() {
     }
   );
   
-  const addCategory = async (name: string, icon?: string) => {
+  const addCategory = async (name: string, color: string, icon?: string) => {
     if (!user) return;
-    const newCategoryPayload: TablesInsert<'categories'> = { name, icon: icon || 'ShoppingCart', user_id: user.id };
+    const newCategoryPayload: TablesInsert<'categories'> = { name, icon: icon || 'ShoppingCart',color , user_id: user.id };
     const { error } = await supabase.from('categories').insert(newCategoryPayload);
     if (error) { toast.error("Erro ao criar categoria", {description: error.message}); throw error; }
     toast.success("Categoria criada com sucesso!");
