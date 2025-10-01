@@ -34,14 +34,14 @@ const ExpenseSchema = Yup.object().shape({
   person_id: Yup.string().required('Selecione um perfil.'),
   category_id: Yup.string().required('Selecione uma categoria.'),
   payment_method: Yup.string().oneOf(['credito', 'debito', 'pix', 'dinheiro', 'outro']).required('Obrigatório'),
-  reimbursement_status: Yup.string().oneOf(['pending', 'reimbursed', 'not_applicable']).required('Obrigatório'),
+  reimbursement_status: Yup.string().oneOf(['pending', 'reimbursed']).required('Obrigatório'),
   installments: Yup.number().integer('Deve ser um número inteiro.').min(1, 'Mínimo de 1 parcela.').max(48, 'Máximo de 48 parcelas.').required('Obrigatório'),
 });
 
 interface ExpenseFormValues {
   description: string; amount: number | ''; date: string;
   person_id: string; category_id: string; payment_method: 'credito' | 'debito' | 'pix' | 'dinheiro' | 'outro';
-  reimbursement_status: 'pending' | 'reimbursed' | 'not_applicable'; installments: number;
+  reimbursement_status: 'pending' | 'reimbursed' ; installments: number;
 }
 
 export function AddExpenseModal({ open, onOpenChange, onSuccess, editingExpense }: AddExpenseModalProps) {
@@ -95,7 +95,7 @@ export function AddExpenseModal({ open, onOpenChange, onSuccess, editingExpense 
               person_id: editingExpense?.person_id || '',
               category_id: editingExpense?.category_id || '',
               payment_method: editingExpense?.payment_method || 'credito',
-              reimbursement_status: editingExpense?.reimbursement_status || 'not_applicable',
+              reimbursement_status: editingExpense?.reimbursement_status || 'pending',
               installments: editingExpense?.installments || 1,
             }}
             validationSchema={ExpenseSchema}
@@ -166,7 +166,7 @@ export function AddExpenseModal({ open, onOpenChange, onSuccess, editingExpense 
                   </div>
                   <div className="space-y-2">
                     <Label>Status do Reembolso</Label>
-                    <Field name="reimbursement_status">{({ field }: any) => (<Select onValueChange={(value) => setFieldValue('reimbursement_status', value)} defaultValue={field.value}><SelectTrigger><SelectValue placeholder="Selecione..." /></SelectTrigger><SelectContent><SelectItem value="not_applicable">Não se aplica</SelectItem><SelectItem value="pending">Pendente</SelectItem><SelectItem value="reimbursed">Reembolsado</SelectItem></SelectContent></Select>)}</Field>
+                    <Field name="reimbursement_status">{({ field }: any) => (<Select onValueChange={(value) => setFieldValue('reimbursement_status', value)} defaultValue={field.value}><SelectTrigger><SelectValue placeholder="Selecione..." /></SelectTrigger><SelectContent><SelectItem value="pending">Pendente</SelectItem><SelectItem value="reimbursed">Reembolsado</SelectItem></SelectContent></Select>)}</Field>
                   </div>
                 </div>
                 <div className="space-y-2">
