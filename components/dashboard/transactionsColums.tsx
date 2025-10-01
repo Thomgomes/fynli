@@ -108,6 +108,9 @@ export const getColumns = ({
     header: "Reembolso",
     cell: ({ row }) => {
       const status = row.original.reimbursement_status;
+      if (!status) {
+            return <span className="text-muted-foreground">-</span>;
+        }
       const { label, className } = statusLabels[status];
       return <Badge variant="outline" className={className}>{label}</Badge>;
     },
