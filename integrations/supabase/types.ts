@@ -72,7 +72,7 @@ export type Database = {
           id: string
           name: string
           updated_at: string
-          user_id: string
+          user_id: string | null
         }
         Insert: {
           created_at?: string
@@ -80,7 +80,7 @@ export type Database = {
           id?: string
           name: string
           updated_at?: string
-          user_id: string
+          user_id?: string | null
         }
         Update: {
           created_at?: string
@@ -88,7 +88,7 @@ export type Database = {
           id?: string
           name?: string
           updated_at?: string
-          user_id?: string
+          user_id?: string | null
         }
         Relationships: []
       }
@@ -104,7 +104,9 @@ export type Database = {
           is_recurring: boolean
           payment_method: Database["public"]["Enums"]["payment_method"] | null
           person_id: string
-          reimbursement_status: Database["public"]["Enums"]["reimbursement_status"]
+          reimbursement_status:
+            | Database["public"]["Enums"]["reimbursement_status"]
+            | null
           updated_at: string
           user_id: string
         }
@@ -119,7 +121,9 @@ export type Database = {
           is_recurring?: boolean
           payment_method?: Database["public"]["Enums"]["payment_method"] | null
           person_id: string
-          reimbursement_status?: Database["public"]["Enums"]["reimbursement_status"]
+          reimbursement_status?:
+            | Database["public"]["Enums"]["reimbursement_status"]
+            | null
           updated_at?: string
           user_id: string
         }
@@ -134,7 +138,9 @@ export type Database = {
           is_recurring?: boolean
           payment_method?: Database["public"]["Enums"]["payment_method"] | null
           person_id?: string
-          reimbursement_status?: Database["public"]["Enums"]["reimbursement_status"]
+          reimbursement_status?:
+            | Database["public"]["Enums"]["reimbursement_status"]
+            | null
           updated_at?: string
           user_id?: string
         }
@@ -246,7 +252,7 @@ export type Database = {
     }
     Enums: {
       payment_method: "credito" | "debito" | "pix" | "dinheiro" | "outro"
-      reimbursement_status: "pending" | "reimbursed" | "not_applicable"
+      reimbursement_status: "pending" | "reimbursed"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -375,7 +381,7 @@ export const Constants = {
   public: {
     Enums: {
       payment_method: ["credito", "debito", "pix", "dinheiro", "outro"],
-      reimbursement_status: ["pending", "reimbursed", "not_applicable"],
+      reimbursement_status: ["pending", "reimbursed"],
     },
   },
 } as const
