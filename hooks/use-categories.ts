@@ -12,7 +12,7 @@ const fetcher = async (userId: string): Promise<Tables<'categories'>[]> => {
   const { data, error } = await supabase
     .from('categories')
     .select('*') // 2. CORRIGIDO: Buscamos TODAS as colunas com '*'
-    .eq('user_id', userId)
+    .or(`user_id.eq.${userId},user_id.is.null`)
     .order('name', { ascending: true });
 
   if (error) {
