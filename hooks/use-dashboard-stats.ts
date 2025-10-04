@@ -10,7 +10,6 @@ type DashboardStats = {
   top_person_amount: number | null;
 };
 
-// O "fetcher" é uma função que busca os dados. SWR vai chamá-la.
 const fetcher = async ([userId, year, month]: [string, number, number]): Promise<DashboardStats> => {
   const { data, error } = await supabase.rpc('get_dashboard_stats', { 
     user_id_param: userId,

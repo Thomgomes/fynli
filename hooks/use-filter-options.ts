@@ -4,7 +4,6 @@ import useSWR from 'swr';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 
-// Tipagem para a resposta da nossa nova função SQL
 export type FilterOption = {
   year: number;
   months: number[];
@@ -28,7 +27,7 @@ export function useFilterOptions() {
   const key = user ? ['filter_options', user.id] : null;
 
   const { data, error, isLoading } = useSWR<FilterOption[]>(key, fetcher, {
-    revalidateOnFocus: false, // Esses dados não mudam com tanta frequência
+    revalidateOnFocus: false,
   });
 
   return {

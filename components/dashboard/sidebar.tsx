@@ -36,7 +36,6 @@ export function DashboardSidebar() {
         isCollapsed ? "w-20" : "w-64"
       )}
     >
-      {/* Header da Sidebar */}
       <div className="flex h-16 items-center justify-between border-b p-4">
         {!isCollapsed && (
           <h2 className="text-xl font-bold text-primary">Fynli</h2>
@@ -55,7 +54,6 @@ export function DashboardSidebar() {
         </Button>
       </div>
 
-      {/* Navegação */}
       <nav className="flex-1 p-2">
         <ul className="space-y-1">
           {sidebarItems.map((item) => (

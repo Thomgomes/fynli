@@ -86,7 +86,7 @@ export default function PeoplePage() {
         open={isModalOpen}
         onOpenChange={setIsModalOpen}
         editingPerson={editingPerson}
-        onSuccess={() => setEditingPerson(null)} // Limpa o estado de edição ao fechar
+        onSuccess={() => setEditingPerson(null)}
       />
     </div>
   );

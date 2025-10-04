@@ -7,20 +7,17 @@ import { useAuth } from '@/contexts/AuthContext';
 import { Tables, TablesInsert, TablesUpdate } from '@/integrations/supabase/types';
 import { toast } from 'sonner';
 
-// Tipo para os filtros que podemos aplicar
 export interface TransactionFilters {
   personId?: string;
   categoryId?: string;
   dateRange?: { from: Date; to: Date };
 }
 
-// Tipo para a paginação
 export interface PaginationState {
-  pageIndex: number; // A página atual, começando em 0
-  pageSize: number;  // Quantos itens por página
+  pageIndex: number;
+  pageSize: number; 
 }
 
-// Tipo para a resposta do fetcher, que inclui os dados e a contagem total
 export interface TransactionsResponse {
   transactions: ExpenseWithRelations[];
   count: number;
@@ -43,10 +40,9 @@ const fetcher = async ([_key, userId, filters, pagination]: [string, string, Tra
       reimbursement_status,
       people ( id, name ),
       categories ( id, name, icon )
-    `, { count: 'exact' }) // 'exact' nos dá a contagem total de itens que correspondem aos filtros
+    `, { count: 'exact' })
     .eq('user_id', userId);
 
-  // Aplicar filtros
   if (filters.personId) {
     query = query.eq('person_id', filters.personId);
   }
@@ -60,12 +56,10 @@ const fetcher = async ([_key, userId, filters, pagination]: [string, string, Tra
     query = query.lte('date', filters.dateRange.to.toISOString());
   }
 
-  // Aplicar paginação
   const from = pagination.pageIndex * pagination.pageSize;
   const to = from + pagination.pageSize - 1;
   query = query.range(from, to);
   
-  // Ordenar pelos mais recentes
   query = query.order('date', { ascending: false }).order('created_at', { ascending: false });
 
   const { data, error, count } = await query;
@@ -80,13 +74,12 @@ const fetcher = async ([_key, userId, filters, pagination]: [string, string, Tra
 
 export function useTransactions(filters: TransactionFilters, pagination: PaginationState) {
   const { user } = useAuth();
-  
-  // A chave SWR agora inclui os filtros e a paginação como um objeto serializado
+
   const key = user ? ['transactions', user.id, filters, pagination] : null;
 
   const { data, error, isLoading, mutate } = useSWR<TransactionsResponse>(key, fetcher, {
     revalidateOnFocus: false,
-    keepPreviousData: true, // Importante para uma boa UX de paginação
+    keepPreviousData: true,
   });
 
   const addTransaction = async (values: any) => {
@@ -119,7 +112,7 @@ export function useTransactions(filters: TransactionFilters, pagination: Paginat
     }
 
     toast.success("Despesa adicionada com sucesso!");
-    mutate(); // Revalida os dados desta tabela
+    mutate();
   };
 
   const deleteTransaction = async (id: string) => {
@@ -129,7 +122,7 @@ export function useTransactions(filters: TransactionFilters, pagination: Paginat
       throw error;
     }
     toast.success("Transação deletada com sucesso.");
-    mutate(); // Revalida os dados para atualizar a tabela
+    mutate();
   };
   
   const updateTransaction = async (id: string, updates: TablesUpdate<'expenses'>) => {

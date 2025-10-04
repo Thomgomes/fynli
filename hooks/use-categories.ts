@@ -6,12 +6,10 @@ import { useAuth } from '@/contexts/AuthContext';
 import { Tables, TablesInsert, TablesUpdate } from '@/integrations/supabase/types';
 import { toast } from 'sonner';
 
-// 1. REMOVEMOS O TIPO 'Category' customizado. Usaremos o tipo oficial 'Tables<'categories'>' diretamente.
-
 const fetcher = async (userId: string): Promise<Tables<'categories'>[]> => {
   const { data, error } = await supabase
     .from('categories')
-    .select('*') // 2. CORRIGIDO: Buscamos TODAS as colunas com '*'
+    .select('*')
     .or(`user_id.eq.${userId},user_id.is.null`)
     .order('name', { ascending: true });
 
@@ -27,7 +25,6 @@ export function useCategories() {
   const { user } = useAuth();
   const key = user ? `categories-${user.id}` : null;
 
-  // 3. CORRIGIDO: Usamos o tipo completo Tables<'categories'>[] aqui.
   const { data: categories, error, isLoading, mutate: revalidate } = useSWR<Tables<'categories'>[]>(
     key, 
     () => fetcher(user!.id),

@@ -1,11 +1,9 @@
 "use client";
-
 import useSWR from 'swr';
 import { supabase } from '@/integrations/supabase/client';
 import { Tables } from '@/integrations/supabase/types';
 import { useAuth } from '@/contexts/AuthContext';
 
-// 1. O TIPO FOI AJUSTADO: trocamos 'color' por 'icon'.
 export type ExpenseWithRelations = Tables<'expenses'> & {
   people: Pick<Tables<'people'>, 'name'> | null;
   categories: Pick<Tables<'categories'>, 'name' | 'icon'> | null;

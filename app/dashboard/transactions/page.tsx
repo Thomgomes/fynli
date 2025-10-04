@@ -101,7 +101,6 @@ export default function TransactionsPage() {
         <CardContent>
           <div className="flex flex-wrap items-center gap-4">
             
-            {/* --- INÍCIO DA CORREÇÃO --- */}
             <Select
               value={filters.personId || 'all'}
               onValueChange={(value) => handleFilterChange('personId', value === 'all' ? undefined : value)}
@@ -127,7 +126,6 @@ export default function TransactionsPage() {
                 {categories?.map(c => <SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>)}
               </SelectContent>
             </Select>
-            {/* --- FIM DA CORREÇÃO --- */}
 
             {isLoadingOptions ? (
               <>

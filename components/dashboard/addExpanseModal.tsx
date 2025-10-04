@@ -16,16 +16,15 @@ import { useCategories } from "@/hooks/use-categories";
 import { Loader2, PlusCircle } from "lucide-react";
 import { CategoryFormDialog } from "./dialog/categoryFormDialog"; 
 import { PersonFormDialog } from "./dialog/peopleFormDialog"; 
-import { ExpenseWithRelations, useTransactions } from "@/hooks/use-transactions"; // Importando o tipo
+import { ExpenseWithRelations, useTransactions } from "@/hooks/use-transactions";
 
 // --- INÍCIO DA CORREÇÃO ---
 interface AddExpenseModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onSuccess?: () => void;
-  editingExpense?: ExpenseWithRelations | null; // Prop para a despesa em edição
+  editingExpense?: ExpenseWithRelations | null;
 }
-// --- FIM DA CORREÇÃO ---
 
 const ExpenseSchema = Yup.object().shape({
   description: Yup.string().min(3, 'A descrição deve ter pelo menos 3 caracteres.').max(100, 'A descrição é muito longa.').required('Obrigatório'),
@@ -47,7 +46,7 @@ interface ExpenseFormValues {
 export function AddExpenseModal({ open, onOpenChange, onSuccess, editingExpense }: AddExpenseModalProps) {
   const { people } = usePeople();
   const { categories } = useCategories();
-  const { addTransaction, updateTransaction } = useTransactions({}, { pageIndex: 0, pageSize: 10 }); // Apenas para ter a função de update
+  const { addTransaction, updateTransaction } = useTransactions({}, { pageIndex: 0, pageSize: 10 });
   
   const [isCreatingPerson, setIsCreatingPerson] = useState(false);
   const [isCreatingCategory, setIsCreatingCategory] = useState(false);
@@ -72,7 +71,6 @@ export function AddExpenseModal({ open, onOpenChange, onSuccess, editingExpense 
       onOpenChange(false);
       onSuccess?.();
     } catch (error: any) {
-      // O hook já mostra o toast de erro, apenas logamos aqui
       console.error("Falha ao salvar despesa", error);
     } finally {
       setSubmitting(false);
@@ -187,8 +185,8 @@ export function AddExpenseModal({ open, onOpenChange, onSuccess, editingExpense 
           </Formik>
         </DialogContent>
       </Dialog>
-      <CategoryFormDialog open={isCreatingCategory} onOpenChange={setIsCreatingCategory} onSuccess={() => { /* SWR vai revalidar a lista automaticamente */ }} />
-      <PersonFormDialog open={isCreatingPerson} onOpenChange={setIsCreatingPerson} onSuccess={() => { /* SWR vai revalidar a lista automaticamente */ }} />
+      <CategoryFormDialog open={isCreatingCategory} onOpenChange={setIsCreatingCategory} onSuccess={() => { }} />
+      <PersonFormDialog open={isCreatingPerson} onOpenChange={setIsCreatingPerson} onSuccess={() => { }} />
     </>
   );
 }

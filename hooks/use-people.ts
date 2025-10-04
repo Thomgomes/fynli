@@ -1,17 +1,14 @@
 "use client";
-
 import useSWR from 'swr';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { Tables, TablesInsert, TablesUpdate } from '@/integrations/supabase/types';
 import { toast } from 'sonner';
 
-// 1. O tipo customizado 'Person' foi removido. Usaremos o tipo completo 'Tables<'people'>'.
-
 const fetcher = async ([_key, userId]: [string, string]): Promise<Tables<'people'>[]> => {
   const { data, error } = await supabase
     .from('people')
-    .select('*') // 2. Corrigido: Buscamos TODAS as colunas com '*'
+    .select('*')
     .eq('user_id', userId)
     .order('name', { ascending: true });
 
@@ -26,7 +23,6 @@ export function usePeople() {
   const { user } = useAuth();
   const key = user ? ['people', user.id] : null;
 
-  // 3. Corrigido: Usamos o tipo completo Tables<'people'>[] aqui.
   const { data: people, error, isLoading, mutate } = useSWR<Tables<'people'>[]>(key, fetcher, {
     revalidateOnFocus: false,
   });

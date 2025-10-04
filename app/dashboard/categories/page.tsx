@@ -21,7 +21,7 @@ import { Tables } from "@/integrations/supabase/types";
 import { useCategories } from "@/hooks/use-categories";
 import { iconMap } from "@/lib/icons";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
-import { CategoryFormDialog } from "@/components/dashboard/dialog/categoryFormDialog"; // Importando o novo componente
+import { CategoryFormDialog } from "@/components/dashboard/dialog/categoryFormDialog";
 import {
   Tooltip,
   TooltipContent,

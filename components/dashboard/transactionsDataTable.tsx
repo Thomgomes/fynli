@@ -51,7 +51,7 @@ export function TransactionsDataTable<TData, TValue>({
     getCoreRowModel: getCoreRowModel(),
     getSortedRowModel: getSortedRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
-    manualPagination: true, // Importante: informa que a paginação é controlada por nós
+    manualPagination: true,
   });
 
   return (

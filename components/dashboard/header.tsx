@@ -23,7 +23,6 @@ interface DashboardHeaderProps {
 export function DashboardHeader({ onAddExpenseClick }: DashboardHeaderProps) {
   const { user, signOut } = useAuth();
 
-  // Função para pegar as iniciais do nome ou do e-mail
   const getUserInitials = () => {
     const name = user?.user_metadata?.display_name || user?.user_metadata?.full_name;
     if (name) {
@@ -54,7 +53,6 @@ export function DashboardHeader({ onAddExpenseClick }: DashboardHeaderProps) {
           </Button>
         <ThemeButton />
 
-        {/* User Menu */}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="ghost" className="relative h-9 w-9 rounded-full">

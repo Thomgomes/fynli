@@ -12,31 +12,29 @@ export type Icon = {
 
 // Nossa lista curada de ícones disponíveis para o usuário
 export const availableIcons: Icon[] = [
-  { name: 'ShoppingCart', component: ShoppingCart },
-  { name: 'UtensilsCrossed', component: UtensilsCrossed },
-  { name: 'Coffee', component: Coffee },
+  { name: 'Carrinho de Compras', component: ShoppingCart },
+  { name: 'Talheres', component: UtensilsCrossed },
+  { name: 'Café', component: Coffee },
   { name: 'Pizza', component: Pizza },
   { name: 'Gamepad2', component: Gamepad2 },
-  { name: 'Film', component: Film },
-  { name: 'Dog', component: Dog },
-  { name: 'PawPrint', component: PawPrint },
-  { name: 'Car', component: Car },
-  { name: 'Bus', component: Bus },
-  { name: 'Plane', component: Plane },
-  { name: 'Fuel', component: Fuel },
-  { name: 'Gift', component: Gift },
-  { name: 'Home', component: Home },
-  { name: 'Shirt', component: Shirt },
-  { name: 'HeartPulse', component: HeartPulse },
-  { name: 'GraduationCap', component: GraduationCap },
-  { name: 'BookOpen', component: BookOpen },
-  { name: 'Landmark', component: Landmark },
+  { name: 'Filme', component: Film },
+  { name: 'Cachorro', component: Dog },
+  { name: 'Pata', component: PawPrint },
+  { name: 'Carro', component: Car },
+  { name: 'Ônibus', component: Bus },
+  { name: 'Avião', component: Plane },
+  { name: 'Combustivel', component: Fuel },
+  { name: 'Presente', component: Gift },
+  { name: 'Casa', component: Home },
+  { name: 'Camisa', component: Shirt },
+  { name: 'Saúde', component: HeartPulse },
+  { name: 'Chapéu', component: GraduationCap },
+  { name: 'Livro', component: BookOpen },
+  { name: 'Banco', component: Landmark },
   { name: 'HandCoins', component: HandCoins },
   { name: 'Puzzle', component: Puzzle },
 ];
 
-// Um objeto de mapeamento para fácil acesso ao componente pelo nome
-// Ex: iconMap['ShoppingCart'] -> nos dará o componente <ShoppingCart />
 export const iconMap: Record<string, LucideIcon> = Object.fromEntries(
   availableIcons.map(icon => [icon.name, icon.component])
 );

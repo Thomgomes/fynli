@@ -20,7 +20,7 @@ import {
   DropdownMenuLabel,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { ExpenseWithRelations } from "@/hooks/use-transactions"; // <-- 1. IMPORTAÇÃO CORRIGIDA
+import { ExpenseWithRelations } from "@/hooks/use-transactions";
 import { Badge } from "@/components/ui/badge";
 import { iconMap } from "@/lib/icons";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
@@ -38,7 +38,6 @@ const paymentMethodMap: Record<string, { label: string; icon: React.ElementType 
   outro: { label: "Outro", icon: CircleDollarSign },
 };
 
-// 2. A definição de colunas agora é uma FUNÇÃO que recebe os handlers de Ação
 export const getColumns = ({
   onEdit,
   onDelete,
