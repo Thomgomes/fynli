@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
-import React, { useState, useMemo, useEffect } from "react";
+import React, { useMemo } from "react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -14,48 +14,35 @@ import { useFilterOptions } from "@/hooks/use-filter-options";
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend, ArcElement);
 
+interface DashboardChartsProps {
+  selectedYear: string | undefined;
+  selectedMonth: string;
+  onYearChange: (year: string) => void;
+  onMonthChange: (month: string) => void;
+}
+
 const getThemeColor = (variableName: string): string => {
   if (typeof window === 'undefined') return '#000000';
   return getComputedStyle(document.documentElement).getPropertyValue(variableName).trim();
 };
 
-const monthLabels: { [key: number]: string } = {
-  1: "Janeiro", 2: "Fevereiro", 3: "Março", 4: "Abril", 5: "Maio", 6: "Junho",
-  7: "Julho", 8: "Agosto", 9: "Setembro", 10: "Outubro", 11: "Novembro", 12: "Dezembro",
-};
+const monthLabels: { [key: number]: string } = {1: "Janeiro", 2: "Fevereiro", 3: "Março", 4: "Abril", 5: "Maio", 6: "Junho", 7: "Julho", 8: "Agosto", 9: "Setembro", 10: "Outubro", 11: "Novembro", 12: "Dezembro"};
 
 function ChartSkeleton() {
-  return (
-    <div className="space-y-6">
-      <div className="flex gap-4 items-center">
-        <Skeleton className="h-4 w-10" />
-        <Skeleton className="h-10 w-28" />
-        <Skeleton className="h-10 w-36" />
-      </div>
-      <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
-        <Card className="lg:col-span-3">
-          <CardContent className="p-6"><Skeleton className="h-[300px] w-full" /></CardContent>
-        </Card>
-        <Card className="lg:col-span-2">
-          <CardContent className="p-6"><Skeleton className="h-[300px] w-full" /></CardContent>
-        </Card>
-      </div>
-    </div>
-  );
+    return (
+        <div className="space-y-6">
+            <div className="flex gap-4 items-center"><Skeleton className="h-4 w-10" /><Skeleton className="h-10 w-28" /><Skeleton className="h-10 w-36" /></div>
+            <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
+                <Card className="lg:col-span-3"><CardContent className="p-6"><Skeleton className="h-[300px] w-full" /></CardContent></Card>
+                <Card className="lg:col-span-2"><CardContent className="p-6"><Skeleton className="h-[300px] w-full" /></CardContent></Card>
+            </div>
+        </div>
+    );
 }
 
-export function DashboardCharts() {
+export function DashboardCharts({ selectedYear, selectedMonth, onYearChange, onMonthChange }: DashboardChartsProps) {
   const { theme } = useTheme();
-  const [selectedYear, setSelectedYear] = useState<string>();
-  const [selectedMonth, setSelectedMonth] = useState("todos");
-  
   const { options: filterOptions, isLoadingOptions } = useFilterOptions();
-
-  useEffect(() => {
-    if (filterOptions && filterOptions.length > 0 && !selectedYear) {
-      setSelectedYear(filterOptions[0].year.toString());
-    }
-  }, [filterOptions, selectedYear]);
   
   const { chartData, isLoading, error } = useChartData({
     year: selectedYear ? parseInt(selectedYear) : new Date().getFullYear(),
@@ -80,10 +67,7 @@ export function DashboardCharts() {
     } else {
       if (!chartData.category_distribution_for_month) return { labels: [], datasets: [] };
       const categoryData = chartData.category_distribution_for_month;
-      return {
-        labels: categoryData.map(c => c.name),
-        datasets: [{ label: 'Gasto na Categoria', data: categoryData.map(c => c.total), backgroundColor: categoryData.map(c => c.color || '#94a3b8') }],
-      };
+      return { labels: categoryData.map(c => c.name), datasets: [{ label: 'Gasto na Categoria', data: categoryData.map(c => c.total), backgroundColor: categoryData.map(c => c.color || '#94a3b8') }] };
     }
   }, [chartData, selectedMonth]);
   
@@ -94,71 +78,14 @@ export function DashboardCharts() {
       datasets: [{
         data: chartData.profile_distribution.map(p => p.total),
         backgroundColor: chartData.profile_distribution.map(p => p.color || '#cccccc'),
-        borderColor: getThemeColor('--background'),
-        borderWidth: 2,
+        borderColor: getThemeColor('--background'), borderWidth: 2,
       }],
     };
   }, [chartData, theme]);
   
   const formatCurrency = (value: number) => new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value);
-
-  const chartOptions = useMemo(() => ({
-    responsive: true,
-    maintainAspectRatio: false,
-    plugins: {
-      legend: { display: false },
-      tooltip: {
-        backgroundColor: getThemeColor('--card'),
-        borderColor: getThemeColor('--border'),
-        borderWidth: 1,
-        titleColor: getThemeColor('--foreground'),
-        bodyColor: getThemeColor('--foreground'),
-        // --- AQUI ESTAVA FALTANDO ---
-        callbacks: {
-          label: (context: any) => {
-            const label = context.dataset.label || context.label || '';
-            const value = context.parsed.y || context.parsed || 0;
-            return `${label}: ${formatCurrency(value)}`;
-          }
-        }
-        // --- FIM DA CORREÇÃO ---
-      }
-    },
-    scales: {
-      x: { 
-        ticks: { color: getThemeColor('--muted-foreground') }, 
-        grid: { color: getThemeColor('--border') } 
-      },
-      y: { 
-        ticks: { color: getThemeColor('--muted-foreground'), callback: (value: any) => formatCurrency(value) }, 
-        grid: { color: getThemeColor('--border') } 
-      }
-    }
-  }), [theme]);
-  
-  const doughnutChartOptions = useMemo(() => ({
-    responsive: true,
-    maintainAspectRatio: false,
-    plugins: {
-      legend: { display: false },
-      tooltip: {
-        backgroundColor: getThemeColor('--card'),
-        borderColor: getThemeColor('--border'),
-        borderWidth: 1,
-        titleColor: getThemeColor('--foreground'),
-        bodyColor: getThemeColor('--foreground'),
-        callbacks: {
-          label: (context: any) => {
-            const label = context.label || '';
-            const value = context.parsed || 0;
-            const total = context.dataset.data.reduce((acc: number, val: number) => acc + val, 0);
-            const percentage = total > 0 ? ((value / total) * 100).toFixed(1) : 0;
-            return `${label}: ${formatCurrency(value)} (${percentage}%)`;
-          }
-        }
-      }
-    }
-  }), [theme]);
+  const chartOptions = useMemo(() => ({ responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false }, tooltip: { backgroundColor: getThemeColor('--card'), borderColor: getThemeColor('--border'), borderWidth: 1, titleColor: getThemeColor('--foreground'), bodyColor: getThemeColor('--foreground'), callbacks: { label: (context: any) => `${context.dataset.label || context.label}: ${formatCurrency(context.parsed.y || context.parsed)}` } } }, scales: { x: { ticks: { color: getThemeColor('--muted-foreground') }, grid: { color: getThemeColor('--border') } }, y: { ticks: { color: getThemeColor('--muted-foreground'), callback: (value: any) => formatCurrency(value) }, grid: { color: getThemeColor('--border') } } } }), [theme]);
+  const doughnutChartOptions = useMemo(() => ({ responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false }, tooltip: { backgroundColor: getThemeColor('--card'), borderColor: getThemeColor('--border'), borderWidth: 1, titleColor: getThemeColor('--foreground'), bodyColor: getThemeColor('--foreground'), callbacks: { label: (context: any) => { const label = context.label || ''; const value = context.parsed || 0; const total = context.dataset.data.reduce((acc: number, val: number) => acc + val, 0); const percentage = total > 0 ? ((value / total) * 100).toFixed(1) : 0; return `${label}: ${formatCurrency(value)} (${percentage}%)`; } } } } }), [theme]);
 
   if (isLoading || isLoadingOptions) return <ChartSkeleton />;
   if (error) return <div className="text-destructive p-4 border border-destructive/50 bg-destructive/10 rounded-md">Erro ao carregar os gráficos.</div>;
@@ -168,7 +95,7 @@ export function DashboardCharts() {
       <div className="flex flex-wrap items-center gap-4">
         <div className="flex items-center gap-2">
           <Label className="font-medium">Ano:</Label>
-          <Select value={selectedYear || ''} onValueChange={(val) => { setSelectedYear(val); setSelectedMonth('todos'); }}>
+          <Select value={selectedYear || ''} onValueChange={(val) => { onYearChange(val); onMonthChange('todos'); }}>
             <SelectTrigger className="w-28"><SelectValue placeholder="Ano..." /></SelectTrigger>
             <SelectContent>
               {filterOptions?.map(opt => <SelectItem key={opt.year} value={opt.year.toString()}>{opt.year}</SelectItem>)}
@@ -177,7 +104,7 @@ export function DashboardCharts() {
         </div>
         <div className="flex items-center gap-2">
           <Label className="font-medium">Mês:</Label>
-          <Select value={selectedMonth} onValueChange={setSelectedMonth} disabled={!selectedYear}>
+          <Select value={selectedMonth} onValueChange={onMonthChange} disabled={!selectedYear}>
             <SelectTrigger className="w-36"><SelectValue placeholder="Mês..." /></SelectTrigger>
             <SelectContent>
                 <SelectItem value="todos">Ano Inteiro</SelectItem>
@@ -190,9 +117,7 @@ export function DashboardCharts() {
         <Card className="lg:col-span-3">
           <CardHeader>
             <CardTitle>{selectedMonth === 'todos' ? `Evolução de Gastos em ${selectedYear}` : `Gastos por Categoria em ${monthLabels[parseInt(selectedMonth)]}`}</CardTitle>
-            <CardDescription>
-              {selectedMonth === 'todos' ? 'Total de despesas registradas por mês.' : 'Soma de todas as despesas por categoria no mês selecionado.'}
-            </CardDescription>
+            <CardDescription>{selectedMonth === 'todos' ? 'Total de despesas registradas por mês.' : 'Soma de todas as despesas por categoria no mês selecionado.'}</CardDescription>
           </CardHeader>
           <CardContent className="h-[300px] p-2">
             <Bar data={barChartData} options={chartOptions} />
@@ -201,16 +126,10 @@ export function DashboardCharts() {
         <Card className="lg:col-span-2">
           <CardHeader>
             <CardTitle>Distribuição por Perfil</CardTitle>
-            <CardDescription>
-              {selectedMonth === 'todos' ? `Total gasto por pessoa em ${selectedYear}` : `Total gasto em ${monthLabels[parseInt(selectedMonth)]}`}
-            </CardDescription>
+            <CardDescription>{selectedMonth === 'todos' ? `Total gasto por pessoa em ${selectedYear}` : `Total gasto em ${monthLabels[parseInt(selectedMonth)]}`}</CardDescription>
           </CardHeader>
           <CardContent className="h-[300px] p-2 flex items-center justify-center">
-             {doughnutChartData.datasets[0]?.data.length > 0 ? (
-                <Doughnut data={doughnutChartData} options={doughnutChartOptions} />
-             ) : (
-                <p className="text-muted-foreground text-sm">Nenhum dado para o período selecionado.</p>
-             )}
+             {doughnutChartData.datasets[0]?.data.length > 0 ? (<Doughnut data={doughnutChartData} options={doughnutChartOptions} />) : (<p className="text-muted-foreground text-sm">Nenhum dado para o período selecionado.</p>)}
           </CardContent>
         </Card>
       </div>

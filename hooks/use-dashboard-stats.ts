@@ -4,7 +4,7 @@ import { useAuth } from '@/contexts/AuthContext';
 
 
 type DashboardStats = {
-  total_selected_month: number;
+  total_in_period: number;
   total_all_time: number;
   top_person_name: string | null;
   top_person_amount: number | null;

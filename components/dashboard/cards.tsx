@@ -4,7 +4,12 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { TrendingUp, Users, PiggyBank } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useDashboardStats } from "@/hooks/use-dashboard-stats";
- // 1. Importar o hook
+
+// 1. O componente agora espera 'year' e 'month' como propriedades
+interface DashboardCardsProps {
+  year: number;
+  month: number; // 0 para "ano inteiro"
+}
 
 function CardSkeleton() {
   return (
@@ -21,13 +26,10 @@ function CardSkeleton() {
   );
 }
 
-export function DashboardCards() {
-  // Parâmetros para os filtros que o hook vai usar
-  const currentYear = new Date().getFullYear();
-  const currentMonth = new Date().getMonth() + 1;
-
-  // 2. TODA a lógica de state e fetch foi substituída por esta única linha!
-  const { stats, isLoading, error } = useDashboardStats({ year: currentYear, month: currentMonth });
+// 2. A função agora recebe as props
+export function DashboardCards({ year, month }: DashboardCardsProps) {
+  // 3. O hook usa os filtros recebidos via props, em vez de calcular a data atual
+  const { stats, isLoading, error } = useDashboardStats({ year, month });
 
   const formatCurrency = (value: number | null | undefined) => {
     if (value === null || value === undefined) return "R$ 0,00";
@@ -35,11 +37,9 @@ export function DashboardCards() {
   };
   
   if (error) {
-    // Uma forma simples de mostrar o erro na UI
     return <div className="text-sm text-destructive p-4 border border-destructive/50 bg-destructive/10 rounded-lg">Erro ao carregar dados dos cards.</div>;
   }
 
-  // O esqueleto é exibido enquanto isLoading é true ou os dados (stats) ainda não chegaram.
   if (isLoading || !stats) {
     return (
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -50,13 +50,15 @@ export function DashboardCards() {
     );
   }
 
-  // 3. O restante do código usa 'stats' que vem diretamente do hook.
+  // 4. Os títulos e descrições agora são dinâmicos com base no filtro
+  const periodLabel = month === 0 ? "neste ano" : "neste mês";
+
   const cards = [
     { 
-      title: "Gasto Total do Mês", 
-      value: formatCurrency(stats.total_selected_month), 
+      title: month === 0 ? "Gasto Total do Ano" : "Gasto Total do Mês", 
+      value: formatCurrency(stats.total_in_period), 
       icon: TrendingUp, 
-      description: "no mês atual" 
+      description: `no período selecionado` 
     },
     { 
       title: "Gasto Total (Geral)", 
@@ -68,7 +70,7 @@ export function DashboardCards() {
       title: "Perfil com Mais Gastos", 
       value: stats.top_person_name || 'Nenhum', 
       icon: Users, 
-      description: `com ${formatCurrency(stats.top_person_amount)} este mês` 
+      description: `com ${formatCurrency(stats.top_person_amount)} ${periodLabel}`
     },
   ];
 
