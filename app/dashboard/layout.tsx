@@ -26,6 +26,8 @@ export default function DashboardLayout({
     mutate((key) => Array.isArray(key) && key[0] === 'transactions');
 
     mutate((key) => Array.isArray(key) && key[0] === 'chart_data');
+
+    mutate((key) => Array.isArray(key) && key[0] === 'filter_options');
   };
 
   return (

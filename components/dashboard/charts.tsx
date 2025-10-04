@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -9,12 +9,19 @@ import { Label } from "@/components/ui/label";
 import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend, ArcElement } from 'chart.js';
 import { Bar, Doughnut } from 'react-chartjs-2';
 import { useChartData } from "@/hooks/use-chart-data";
+import { useTheme } from "next-themes";
+import { useFilterOptions } from "@/hooks/use-filter-options";
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend, ArcElement);
 
 const getThemeColor = (variableName: string): string => {
   if (typeof window === 'undefined') return '#000000';
   return getComputedStyle(document.documentElement).getPropertyValue(variableName).trim();
+};
+
+const monthLabels: { [key: number]: string } = {
+  1: "Janeiro", 2: "Fevereiro", 3: "Março", 4: "Abril", 5: "Maio", 6: "Junho",
+  7: "Julho", 8: "Agosto", 9: "Setembro", 10: "Outubro", 11: "Novembro", 12: "Dezembro",
 };
 
 function ChartSkeleton() {
@@ -38,55 +45,50 @@ function ChartSkeleton() {
 }
 
 export function DashboardCharts() {
-  const currentYear = new Date().getFullYear().toString();
-  const [selectedYear, setSelectedYear] = useState(currentYear);
+  const { theme } = useTheme();
+  const [selectedYear, setSelectedYear] = useState<string>();
   const [selectedMonth, setSelectedMonth] = useState("todos");
+  
+  const { options: filterOptions, isLoadingOptions } = useFilterOptions();
 
+  useEffect(() => {
+    if (filterOptions && filterOptions.length > 0 && !selectedYear) {
+      setSelectedYear(filterOptions[0].year.toString());
+    }
+  }, [filterOptions, selectedYear]);
+  
   const { chartData, isLoading, error } = useChartData({
-    year: parseInt(selectedYear),
+    year: selectedYear ? parseInt(selectedYear) : new Date().getFullYear(),
     month: selectedMonth === 'todos' ? 0 : parseInt(selectedMonth),
   });
 
-  const years = Array.from({ length: 5 }, (_, i) => (new Date().getFullYear() - i).toString());
-  const months = [
-    { value: "todos", label: "Ano Inteiro" }, { value: "01", label: "Janeiro" },
-    { value: "02", label: "Fevereiro" }, { value: "03", label: "Março" },
-    { value: "04", label: "Abril" }, { value: "05", label: "Maio" },
-    { value: "06", label: "Junho" }, { value: "07", label: "Julho" },
-    { value: "08", label: "Agosto" }, { value: "09", label: "Setembro" },
-    { value: "10", label: "Outubro" }, { value: "11", label: "Novembro" },
-    { value: "12", label: "Dezembro" },
-  ];
-  
-  const monthColors = [
-  '#3b82f6', '#16a34a', '#f97316', '#ef4444', '#8b5cf6', '#ec4899',
-  '#f59e0b', '#10b981', '#6366f1', '#d946ef', '#0ea5e9', '#e11d48'
-];
+  const availableMonths = useMemo(() => {
+    if (!selectedYear || !filterOptions) return [];
+    const yearData = filterOptions.find(opt => opt.year.toString() === selectedYear);
+    return yearData ? yearData.months : [];
+  }, [selectedYear, filterOptions]);
+
+  const monthColors = ['#3b82f6', '#16a34a', '#f97316', '#ef4444', '#8b5cf6', '#ec4899', '#f59e0b', '#10b981', '#6366f1', '#d946ef', '#0ea5e9', '#e11d48'];
 
   const barChartData = useMemo(() => {
-    if (!chartData) return { labels: [], datasets: [] };
-
+    if (!chartData || !chartData.monthly_expenses) return { labels: [], datasets: [] };
     if (selectedMonth === 'todos') {
       const monthNames = ["Jan", "Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago", "Set", "Out", "Nov", "Dez"];
       const monthlyTotals = new Array(12).fill(0);
-      chartData.monthly_expenses.forEach(item => {
-          monthlyTotals[item.month - 1] = item.total;
-      });
-      return {
-        labels: monthNames,
-        datasets: [{ label: 'Gasto Mensal', data: monthlyTotals, backgroundColor: monthColors }],
-      };
+      chartData.monthly_expenses.forEach(item => { monthlyTotals[item.month - 1] = item.total; });
+      return { labels: monthNames, datasets: [{ label: 'Gasto Mensal', data: monthlyTotals, backgroundColor: monthColors }] };
     } else {
+      if (!chartData.category_distribution_for_month) return { labels: [], datasets: [] };
       const categoryData = chartData.category_distribution_for_month;
       return {
         labels: categoryData.map(c => c.name),
-        datasets: [{ label: 'Gasto na Categoria', data: categoryData.map(c => c.total), backgroundColor: categoryData.map(c => c.color || '#94a3b8'), }],
-      }
+        datasets: [{ label: 'Gasto na Categoria', data: categoryData.map(c => c.total), backgroundColor: categoryData.map(c => c.color || '#94a3b8') }],
+      };
     }
   }, [chartData, selectedMonth]);
   
   const doughnutChartData = useMemo(() => {
-    if (!chartData) return { labels: [], datasets: [] };
+    if (!chartData || !chartData.profile_distribution) return { labels: [], datasets: [] };
     return {
       labels: chartData.profile_distribution.map(p => p.name),
       datasets: [{
@@ -96,53 +98,90 @@ export function DashboardCharts() {
         borderWidth: 2,
       }],
     };
-  }, [chartData]);
+  }, [chartData, theme]);
   
   const formatCurrency = (value: number) => new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value);
 
-  const chartOptions = {
+  const chartOptions = useMemo(() => ({
     responsive: true,
     maintainAspectRatio: false,
     plugins: {
       legend: { display: false },
       tooltip: {
-        backgroundColor: getThemeColor('--chart-card'),
-        borderColor: getThemeColor('--chart-border'),
+        backgroundColor: getThemeColor('--card'),
+        borderColor: getThemeColor('--border'),
         borderWidth: 1,
-        titleColor: getThemeColor('--chart-foreground'),
-        bodyColor: getThemeColor('--chart-foreground'),
+        titleColor: getThemeColor('--foreground'),
+        bodyColor: getThemeColor('--foreground'),
+        // --- AQUI ESTAVA FALTANDO ---
         callbacks: {
-          label: (context: any) => `${context.dataset.label || context.label}: ${formatCurrency(context.parsed.y || context.parsed)}`
+          label: (context: any) => {
+            const label = context.dataset.label || context.label || '';
+            const value = context.parsed.y || context.parsed || 0;
+            return `${label}: ${formatCurrency(value)}`;
+          }
         }
+        // --- FIM DA CORREÇÃO ---
       }
     },
     scales: {
-      x: { ticks: { color: getThemeColor('--muted-foreground') }, grid: { color: getThemeColor('--chart-border') } },
-      y: { ticks: { color: getThemeColor('--muted-foreground'), callback: (value: any) => formatCurrency(value) }, grid: { color: getThemeColor('--chart-border') } }
+      x: { 
+        ticks: { color: getThemeColor('--muted-foreground') }, 
+        grid: { color: getThemeColor('--border') } 
+      },
+      y: { 
+        ticks: { color: getThemeColor('--muted-foreground'), callback: (value: any) => formatCurrency(value) }, 
+        grid: { color: getThemeColor('--border') } 
+      }
     }
-  };
+  }), [theme]);
+  
+  const doughnutChartOptions = useMemo(() => ({
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: { display: false },
+      tooltip: {
+        backgroundColor: getThemeColor('--card'),
+        borderColor: getThemeColor('--border'),
+        borderWidth: 1,
+        titleColor: getThemeColor('--foreground'),
+        bodyColor: getThemeColor('--foreground'),
+        callbacks: {
+          label: (context: any) => {
+            const label = context.label || '';
+            const value = context.parsed || 0;
+            const total = context.dataset.data.reduce((acc: number, val: number) => acc + val, 0);
+            const percentage = total > 0 ? ((value / total) * 100).toFixed(1) : 0;
+            return `${label}: ${formatCurrency(value)} (${percentage}%)`;
+          }
+        }
+      }
+    }
+  }), [theme]);
 
-  if (isLoading) return <ChartSkeleton />;
-  if (error) return <div className="text-destructive p-4 border border-destructive/50 bg-destructive/10 rounded-md">Erro ao carregar os gráficos. Por favor, tente recarregar a página.</div>;
+  if (isLoading || isLoadingOptions) return <ChartSkeleton />;
+  if (error) return <div className="text-destructive p-4 border border-destructive/50 bg-destructive/10 rounded-md">Erro ao carregar os gráficos.</div>;
 
   return (
     <div className="space-y-6">
       <div className="flex flex-wrap items-center gap-4">
         <div className="flex items-center gap-2">
           <Label className="font-medium">Ano:</Label>
-          <Select value={selectedYear} onValueChange={setSelectedYear}>
-            <SelectTrigger className="w-28"><SelectValue /></SelectTrigger>
+          <Select value={selectedYear || ''} onValueChange={(val) => { setSelectedYear(val); setSelectedMonth('todos'); }}>
+            <SelectTrigger className="w-28"><SelectValue placeholder="Ano..." /></SelectTrigger>
             <SelectContent>
-              {years.map(y => <SelectItem key={y} value={y}>{y}</SelectItem>)}
+              {filterOptions?.map(opt => <SelectItem key={opt.year} value={opt.year.toString()}>{opt.year}</SelectItem>)}
             </SelectContent>
           </Select>
         </div>
         <div className="flex items-center gap-2">
           <Label className="font-medium">Mês:</Label>
-          <Select value={selectedMonth} onValueChange={setSelectedMonth}>
-            <SelectTrigger className="w-36"><SelectValue /></SelectTrigger>
+          <Select value={selectedMonth} onValueChange={setSelectedMonth} disabled={!selectedYear}>
+            <SelectTrigger className="w-36"><SelectValue placeholder="Mês..." /></SelectTrigger>
             <SelectContent>
-              {months.map(m => <SelectItem key={m.value} value={m.value}>{m.label}</SelectItem>)}
+                <SelectItem value="todos">Ano Inteiro</SelectItem>
+                {availableMonths.map(month => <SelectItem key={month} value={month.toString()}>{monthLabels[month]}</SelectItem>)}
             </SelectContent>
           </Select>
         </div>
@@ -150,13 +189,12 @@ export function DashboardCharts() {
       <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
         <Card className="lg:col-span-3">
           <CardHeader>
-            <CardTitle>{selectedMonth === 'todos' ? `Evolução de Gastos em ${selectedYear}` : `Gastos por Categoria em ${months.find(m => m.value === selectedMonth)?.label}`}</CardTitle>
+            <CardTitle>{selectedMonth === 'todos' ? `Evolução de Gastos em ${selectedYear}` : `Gastos por Categoria em ${monthLabels[parseInt(selectedMonth)]}`}</CardTitle>
             <CardDescription>
               {selectedMonth === 'todos' ? 'Total de despesas registradas por mês.' : 'Soma de todas as despesas por categoria no mês selecionado.'}
             </CardDescription>
           </CardHeader>
           <CardContent className="h-[300px] p-2">
-            {/* --- AQUI ESTÁ A CORREÇÃO --- */}
             <Bar data={barChartData} options={chartOptions} />
           </CardContent>
         </Card>
@@ -164,12 +202,12 @@ export function DashboardCharts() {
           <CardHeader>
             <CardTitle>Distribuição por Perfil</CardTitle>
             <CardDescription>
-              {selectedMonth === 'todos' ? `Total gasto por pessoa em ${selectedYear}` : `Total gasto em ${months.find(m => m.value === selectedMonth)?.label}`}
+              {selectedMonth === 'todos' ? `Total gasto por pessoa em ${selectedYear}` : `Total gasto em ${monthLabels[parseInt(selectedMonth)]}`}
             </CardDescription>
           </CardHeader>
           <CardContent className="h-[300px] p-2 flex items-center justify-center">
              {doughnutChartData.datasets[0]?.data.length > 0 ? (
-                <Doughnut data={doughnutChartData} options={{ ...chartOptions, scales: {} }} />
+                <Doughnut data={doughnutChartData} options={doughnutChartOptions} />
              ) : (
                 <p className="text-muted-foreground text-sm">Nenhum dado para o período selecionado.</p>
              )}
