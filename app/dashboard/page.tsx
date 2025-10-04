@@ -31,7 +31,8 @@ export default function DashboardPage() {
         onMonthChange={setSelectedMonth}
       />
       <RecentTransactions />
-      <div className="md:hidden block">uhu meu fi</div>
+      <div className="md:hidden block">uhu meu fi</div> 
+      {/* não apagar essa div, ela é importante para o layout do dashboard em telas pequenas */}
     </div>
   );
 }
