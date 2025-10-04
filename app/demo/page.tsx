@@ -113,7 +113,7 @@ export default function DemoPage() {
           </h2>
           <p className="text-xl text-muted-foreground mb-8 max-w-2xl mx-auto">
             Gerencie despesas em grupo, divida contas de forma justa e acompanhe
-            seus gastos com gráficos detalhados e relatórios inteligentes.
+            seus gastos com gráficos detalhados e relatórios inteligentes
           </p>
           <div className="flex gap-4 justify-center mb-12">
             <Button size="lg" asChild>
