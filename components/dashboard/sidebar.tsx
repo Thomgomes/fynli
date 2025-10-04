@@ -21,7 +21,6 @@ const sidebarItems = [
   { title: "Pessoas", href: "/dashboard/people", icon: Users },
   { title: "Categorias", href: "/dashboard/categories", icon: Tags },
   { title: "Transações", href: "/dashboard/transactions", icon: FileText },
-  { title: "Relatórios", href: "/dashboard/reports", icon: BarChart3 },
   { title: "Configurações", href: "/dashboard/settings", icon: Settings },
 ];
 
@@ -30,10 +29,12 @@ export function DashboardSidebar() {
   const pathname = usePathname();
 
   return (
+    <>
     <aside
       className={cn(
         "hidden h-screen border-r bg-card transition-all duration-300 ease-in-out md:flex md:flex-col",
-        isCollapsed ? "w-20" : "w-64"
+        isCollapsed ? "w-20" : "w-64",
+        "sticky top-0"
       )}
     >
       <div className="flex h-16 items-center justify-between border-b p-4">
@@ -76,5 +77,26 @@ export function DashboardSidebar() {
         </ul>
       </nav>
     </aside>
+    <nav className="fixed bottom-0 left-0 right-0 z-50 flex items-center justify-between border-t bg-card p-2 md:hidden">
+      <ul className="flex w-full justify-around">
+          {sidebarItems.map((item) => (
+            <li key={item.title}>
+              <Link
+                href={item.href}
+                className={cn(
+                  "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors",
+                  "hover:bg-muted hover:text-primary",
+                  pathname === item.href
+                    ? "bg-primary text-primary-foreground shadow-sm hover:bg-primary/90 hover:text-primary-foreground"
+                    : "text-muted-foreground"
+                )}
+              >
+                <item.icon className="h-5 w-5 flex-shrink-0" />
+              </Link>
+            </li>
+          ))}
+        </ul>
+    </nav>
+    </>
   );
 }
