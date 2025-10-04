@@ -5,7 +5,7 @@ import { TrendingUp, Users, PiggyBank } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useDashboardStats } from "@/hooks/use-dashboard-stats";
 
-// 1. O componente agora espera 'year' e 'month' como propriedades
+// 1. O componente agora espera 'year' e 'month' como props.
 interface DashboardCardsProps {
   year: number;
   month: number; // 0 para "ano inteiro"
@@ -26,9 +26,8 @@ function CardSkeleton() {
   );
 }
 
-// 2. A função agora recebe as props
 export function DashboardCards({ year, month }: DashboardCardsProps) {
-  // 3. O hook usa os filtros recebidos via props, em vez de calcular a data atual
+  // 2. O hook agora usa os filtros dinâmicos recebidos via props.
   const { stats, isLoading, error } = useDashboardStats({ year, month });
 
   const formatCurrency = (value: number | null | undefined) => {
@@ -50,7 +49,7 @@ export function DashboardCards({ year, month }: DashboardCardsProps) {
     );
   }
 
-  // 4. Os títulos e descrições agora são dinâmicos com base no filtro
+  // 3. Os títulos e descrições agora são dinâmicos com base no filtro.
   const periodLabel = month === 0 ? "neste ano" : "neste mês";
 
   const cards = [

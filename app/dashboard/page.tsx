@@ -18,10 +18,8 @@ export default function DashboardPage() {
     }
   }, [filterOptions, selectedYear]);
 
-  const yearAsNumber = selectedYear
-    ? parseInt(selectedYear)
-    : new Date().getFullYear();
-  const monthAsNumber = selectedMonth === "todos" ? 0 : parseInt(selectedMonth);
+  const yearAsNumber = selectedYear ? parseInt(selectedYear) : new Date().getFullYear();
+  const monthAsNumber = selectedMonth === 'todos' ? 0 : parseInt(selectedMonth);
 
   return (
     <div className="space-y-6">
