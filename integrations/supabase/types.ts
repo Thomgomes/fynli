@@ -245,7 +245,7 @@ export type Database = {
           top_person_amount: number
           top_person_name: string
           total_all_time: number
-          total_selected_month: number
+          total_in_period: number
         }[]
       }
       get_filter_options: {
