@@ -7,7 +7,6 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue, SelectSeparator } from "@/components/ui/select";
-import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
 import { Formik, Form, Field, FormikHelpers } from 'formik';
 import * as Yup from 'yup';
