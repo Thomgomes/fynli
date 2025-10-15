@@ -45,7 +45,7 @@ interface ExpenseFormValues {
 export function AddExpenseModal({ open, onOpenChange, onSuccess, editingExpense }: AddExpenseModalProps) {
   const { people } = usePeople();
   const { categories } = useCategories();
-  const { addTransaction, updateTransaction } = useTransactions({}, { pageIndex: 0, pageSize: 10 });
+  const { addTransaction, updateTransaction } = useTransactions({});
   
   const [isCreatingPerson, setIsCreatingPerson] = useState(false);
   const [isCreatingCategory, setIsCreatingCategory] = useState(false);
