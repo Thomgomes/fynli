@@ -72,6 +72,11 @@ export const getColumns = ({
     accessorKey: "people",
     header: "Perfil",
     cell: ({ row }) => row.original.people?.name || "N/A",
+    // Esconda em mobile
+    meta: {
+      className: "hidden md:table-cell",
+      headerClassName: "hidden md:table-cell",
+    },
   },
   {
     accessorKey: "amount",
@@ -97,9 +102,14 @@ export const getColumns = ({
       return (
         <div className="flex items-center gap-2">
           <Icon className="h-4 w-4 text-muted-foreground" />
-          <span className="hidden lg:inline">{label}</span>
+          <span className="hidden sm:inline">{label}</span>
         </div>
       );
+    },
+    // Esconda em mobile
+    meta: {
+      className: "hidden lg:table-cell",
+      headerClassName: "hidden lg:table-cell",
     },
   },
   {
@@ -108,10 +118,15 @@ export const getColumns = ({
     cell: ({ row }) => {
       const status = row.original.reimbursement_status;
       if (!status) {
-            return <span className="text-muted-foreground">-</span>;
-        }
+        return <span className="text-muted-foreground">-</span>;
+      }
       const { label, className } = statusLabels[status];
       return <Badge variant="outline" className={className}>{label}</Badge>;
+    },
+    // Esconda em mobile
+    meta: {
+      className: "hidden xl:table-cell",
+      headerClassName: "hidden xl:table-cell",
     },
   },
   {
@@ -123,6 +138,11 @@ export const getColumns = ({
       </Button>
     ),
     cell: ({ row }) => new Date(row.original.date).toLocaleDateString("pt-BR", { timeZone: "UTC" }),
+    // Esconda em mobile
+    meta: {
+      className: "hidden sm:table-cell",
+      headerClassName: "hidden sm:table-cell",
+    },
   },
   {
     id: "actions",
