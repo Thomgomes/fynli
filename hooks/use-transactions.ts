@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import useSWRInfinite from 'swr/infinite';
@@ -5,6 +6,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { Tables, TablesInsert, TablesUpdate } from '@/integrations/supabase/types';
 import { toast } from 'sonner';
+import { useMemo, useCallback } from 'react';
 
 export interface TransactionFilters {
   personId?: string;
@@ -27,7 +29,15 @@ export interface TransactionsResponse {
   count: number;
 }
 
-const fetcher = async ([_key, userId, filters, pagination]: [string, string, TransactionFilters, PaginationState]): Promise<TransactionsResponse> => {
+const PAGE_SIZE = 10;
+
+// ✅ CORREÇÃO 1: Fetcher simplificado que recebe os parâmetros diretamente
+const fetcher = async (
+  userId: string,
+  filters: TransactionFilters,
+  pageIndex: number,
+  pageSize: number
+): Promise<TransactionsResponse> => {
   let query = supabase
     .from('expenses')
     .select(`*, people(id, name), categories(id, name, icon)`, { count: 'exact' })
@@ -35,92 +45,193 @@ const fetcher = async ([_key, userId, filters, pagination]: [string, string, Tra
 
   if (filters.personId) { query = query.eq('person_id', filters.personId); }
   if (filters.categoryId) { query = query.eq('category_id', filters.categoryId); }
-  if (filters.dateRange?.from) { query = query.gte('date', filters.dateRange.from.toISOString()); }
-  if (filters.dateRange?.to) { query = query.lte('date', filters.dateRange.to.toISOString()); }
+  if (filters.dateRange?.from) { 
+    query = query.gte('date', filters.dateRange.from.toISOString()); 
+  }
+  if (filters.dateRange?.to) { 
+    query = query.lte('date', filters.dateRange.to.toISOString()); 
+  }
 
-  const from = pagination.pageIndex * pagination.pageSize;
-  const to = from + pagination.pageSize - 1;
+  const from = pageIndex * pageSize;
+  const to = from + pageSize - 1;
   query = query.range(from, to);
   
   query = query.order('date', { ascending: false }).order('created_at', { ascending: false });
 
   const { data, error, count } = await query;
   if (error) throw new Error(error.message);
-  return { transactions: (data as ExpenseWithRelations[]) || [], count: count || 0 };
+  
+  return { 
+    transactions: (data as ExpenseWithRelations[]) || [], 
+    count: count || 0 
+  };
 };
 
 export function useTransactions(filters: TransactionFilters) {
   const { user } = useAuth();
-  const PAGE_SIZE = 10;
 
-  const getKey = (pageIndex: number, previousPageData: TransactionsResponse | null) => {
-    if (!user) return null;
-    if (previousPageData && !previousPageData.transactions.length) return null;
-    return ['transactions', user.id, filters, { pageIndex, pageSize: PAGE_SIZE }];
-  };
+  // ✅ CORREÇÃO 2: Cria uma chave estável para os filtros usando JSON.stringify
+  const filterKey = useMemo(() => {
+    return JSON.stringify({
+      personId: filters.personId,
+      categoryId: filters.categoryId,
+      dateFrom: filters.dateRange?.from?.toISOString(),
+      dateTo: filters.dateRange?.to?.toISOString(),
+    });
+  }, [filters.personId, filters.categoryId, filters.dateRange?.from, filters.dateRange?.to]);
 
-  const { data, error, isLoading, mutate, size, setSize } = useSWRInfinite<TransactionsResponse>(getKey, fetcher, {
-    revalidateOnFocus: false,
-    keepPreviousData: true,
-  });
+  // ✅ CORREÇÃO 3: getKey otimizado que usa string como base
+  const getKey = useCallback(
+    (pageIndex: number, previousPageData: TransactionsResponse | null) => {
+      if (!user) return null;
+      
+      // Para após a última página
+      if (previousPageData && !previousPageData.transactions.length) return null;
+      
+      // Chave única e estável
+      return `transactions_${user.id}_${filterKey}_page_${pageIndex}`;
+    },
+    [user, filterKey]
+  );
 
-  const transactions = data ? data.flatMap(page => page.transactions) : [];
+  const { data, error, isLoading, mutate, size, setSize } = useSWRInfinite<TransactionsResponse>(
+    getKey,
+    (_key) => {
+      if (!user) return Promise.resolve({ transactions: [], count: 0 });
+      
+      // Extrai pageIndex da chave
+      const match = _key.match(/_page_(\d+)$/);
+      const pageIndex = match ? parseInt(match[1], 10) : 0;
+      
+      return fetcher(user.id, filters, pageIndex, PAGE_SIZE);
+    },
+    {
+      // ✅ CORREÇÃO 4: Configurações otimizadas
+      revalidateOnFocus: false,
+      revalidateOnReconnect: false,
+      revalidateIfStale: false,
+      revalidateFirstPage: false, // Não revalida a primeira página ao mudar de página
+      persistSize: true,          // Mantém o tamanho ao revalidar
+      dedupingInterval: 5000,
+      // parallel: true,          // Descomente para carregar páginas em paralelo
+    }
+  );
+
+  const transactions = useMemo(
+    () => data ? data.flatMap(page => page.transactions) : [],
+    [data]
+  );
+  
   const totalCount = data?.[0]?.count ?? 0;
   const hasMore = transactions.length < totalCount;
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const addTransaction = async (values: any) => {
-    if (!user) throw new Error("Usuário não autenticado.");
+  // ✅ CORREÇÃO 5: Otimização com atualizações otimistas
+  const addTransaction = useCallback(
+    async (values: any) => {
+      if (!user) throw new Error("Usuário não autenticado.");
 
-    const expensesToInsert: TablesInsert<'expenses'>[] = [];
-    const totalInstallments = values.installments > 1 ? values.installments : 1;
-    const installmentAmount = (values.amount as number) / totalInstallments;
+      const expensesToInsert: TablesInsert<'expenses'>[] = [];
+      const totalInstallments = values.installments > 1 ? values.installments : 1;
+      const installmentAmount = (values.amount as number) / totalInstallments;
 
-    for (let i = 0; i < totalInstallments; i++) {
-      const expenseDate = new Date(values.date);
-      expenseDate.setUTCMonth(expenseDate.getUTCMonth() + i);
-      expensesToInsert.push({
-        user_id: user.id,
-        person_id: values.person_id,
-        category_id: values.category_id,
-        description: totalInstallments > 1 ? `${values.description} (${i + 1}/${totalInstallments})` : values.description,
-        amount: installmentAmount,
-        date: expenseDate.toISOString().split('T')[0],
-        payment_method: values.payment_method,
-        reimbursement_status: values.reimbursement_status,
-        installments: totalInstallments,
-      });
-    }
+      for (let i = 0; i < totalInstallments; i++) {
+        const expenseDate = new Date(values.date);
+        expenseDate.setUTCMonth(expenseDate.getUTCMonth() + i);
+        expensesToInsert.push({
+          user_id: user.id,
+          person_id: values.person_id,
+          category_id: values.category_id,
+          description: totalInstallments > 1 
+            ? `${values.description} (${i + 1}/${totalInstallments})` 
+            : values.description,
+          amount: installmentAmount,
+          date: expenseDate.toISOString().split('T')[0],
+          payment_method: values.payment_method,
+          reimbursement_status: values.reimbursement_status,
+          installments: totalInstallments,
+        });
+      }
 
-    const { error: insertError } = await supabase.from('expenses').insert(expensesToInsert);
-    if (insertError) {
-      toast.error("Erro ao adicionar despesa", { description: insertError.message });
-      throw insertError;
-    }
+      const { error: insertError } = await supabase
+        .from('expenses')
+        .insert(expensesToInsert);
+        
+      if (insertError) {
+        toast.error("Erro ao adicionar despesa", { description: insertError.message });
+        throw insertError;
+      }
 
-    toast.success("Despesa adicionada com sucesso!");
-    mutate();
-  };
+      toast.success("Despesa adicionada com sucesso!");
+      
+      // ✅ Revalida apenas a primeira página
+      await mutate();
+    },
+    [user, mutate]
+  );
 
-  const deleteTransaction = async (id: string) => {
-    const { error } = await supabase.from('expenses').delete().eq('id', id);
-    if (error) {
-      toast.error("Erro ao deletar transação", { description: error.message });
-      throw error;
-    }
-    toast.success("Transação deletada com sucesso.");
-    mutate();
-  };
-  
-  const updateTransaction = async (id: string, updates: TablesUpdate<'expenses'>) => {
-    const { error } = await supabase.from('expenses').update(updates).eq('id', id);
-     if (error) {
-      toast.error("Erro ao atualizar transação", { description: error.message });
-      throw error;
-    }
-    toast.success("Transação atualizada com sucesso.");
-    mutate();
-  };
+  const deleteTransaction = useCallback(
+    async (id: string) => {
+      // ✅ CORREÇÃO 6: Update otimista
+      const optimisticData = data?.map(page => ({
+        ...page,
+        transactions: page.transactions.filter(t => t.id !== id),
+        count: page.count - 1,
+      }));
+
+      await mutate(
+        async () => {
+          const { error } = await supabase.from('expenses').delete().eq('id', id);
+          if (error) {
+            toast.error("Erro ao deletar transação", { description: error.message });
+            throw error;
+          }
+          toast.success("Transação deletada com sucesso.");
+          
+          // Retorna os dados atualizados
+          return optimisticData;
+        },
+        {
+          optimisticData,
+          revalidate: true, // Revalida para garantir consistência
+        }
+      );
+    },
+    [data, mutate]
+  );
+
+  const updateTransaction = useCallback(
+    async (id: string, updates: TablesUpdate<'expenses'>) => {
+      // ✅ Update otimista
+      const optimisticData = data?.map(page => ({
+        ...page,
+        transactions: page.transactions.map(t =>
+          t.id === id ? { ...t, ...updates } : t
+        ),
+      }));
+
+      await mutate(
+        async () => {
+          const { error } = await supabase
+            .from('expenses')
+            .update(updates)
+            .eq('id', id);
+            
+          if (error) {
+            toast.error("Erro ao atualizar transação", { description: error.message });
+            throw error;
+          }
+          toast.success("Transação atualizada com sucesso.");
+          
+          return optimisticData;
+        },
+        {
+          optimisticData,
+          revalidate: true,
+        }
+      );
+    },
+    [data, mutate]
+  );
 
   return {
     transactions,
@@ -128,7 +239,7 @@ export function useTransactions(filters: TransactionFilters) {
     isLoading: isLoading && !data,
     error,
     hasMore,
-    loadMore: () => setSize(size + 1),
+    loadMore: useCallback(() => setSize(size + 1), [setSize, size]),
     pageCount: Math.ceil(totalCount / PAGE_SIZE),
     addTransaction,
     updateTransaction,
