@@ -12,16 +12,22 @@ import {
   Calendar,
   Zap,
   Eye,
-  Shield,
   CheckCircle2,
   Circle,
-  Sparkles,
   Tags,
+  GitBranch,
+  ChevronDown,
 } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { motion } from "framer-motion";
 import Footer from "@/components/footer";
 import { DoughnutDemo } from "@/components/DoughnutDemo";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
 
 // --- Componente de Ação do Cabeçalho (com Verificação de Auth) ---
 function HeaderActions() {
@@ -96,13 +102,24 @@ export default function DemoPage() {
 
   const roadmapItems = [
     {
-      title: "MVP 1.0 com controle de perfis e parcelamentos",
+      title: "MVP 1.0: A Fundação Completa",
       status: "completed",
+      description: [
+        "Sistema de autenticação completo com login social, e-mail/senha e recuperação via OTP.",
+        "Banco de dados PostgreSQL robusto com Segurança a Nível de Linha (RLS) ativada.",
+        "CRUDs completos para Perfis (Pessoas) e Categorias (com ícones e cores).",
+        "Implementação da lógica de parcelamento, a funcionalidade principal do app.",
+        "Dashboard dinâmico com SWR e Funções RPC.",
+      ],
     },
     {
-      title: "Organização de multiplos gastos",
+      title: "Organização de Múltiplos Gastos",
       status: "in-progress",
     },
+    // {
+    //   title: "Módulo de teste",
+    //   status: "upcoming",
+    // },
   ];
 
   return (
@@ -291,69 +308,83 @@ export default function DemoPage() {
               </p>
             </motion.div>
 
-            <div className="space-y-6">
-              {roadmapItems.map((item, index) => (
-                <motion.div
-                  key={index}
-                  initial={{ opacity: 0, x: -30 }}
-                  whileInView={{ opacity: 1, x: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ duration: 0.6, delay: index * 0.1 }}
-                  className={`flex items-start gap-4 p-6 rounded-2xl border transition-all ${
-                    item.status === "completed"
-                      ? "bg-success/5 border-success/30"
-                      : item.status === "in-progress"
-                      ? "bg-primary/5 border-primary/30"
-                      : "bg-muted/50 border-border"
-                  }`}
-                >
-                  <div className="flex-shrink-0 mt-1">
-                    {item.status === "completed" ? (
-                      <CheckCircle2 className="text-success" size={24} />
-                    ) : (
-                      <Circle
-                        className={
-                          item.status === "in-progress"
-                            ? "text-primary"
-                            : "text-muted-foreground/50"
-                        }
-                        size={24}
-                      />
-                    )}
-                  </div>
-                  <div className="flex-1">
-                    <p
-                      className={`text-lg font-medium ${
-                        item.status === "completed"
-                          ? "text-foreground"
-                          : item.status === "in-progress"
-                          ? "text-primary"
-                          : "text-muted-foreground"
-                      }`}
+            {/* Accordion com animação suave e seta customizada */}
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6, delay: 0.1 }}
+            >
+              <Accordion type="single" collapsible className="w-full space-y-4">
+                {roadmapItems.map((item, index) => {
+                  const hasDescription =
+                    item.description && item.description.length > 0;
+                  return (
+                    <motion.div
+                      key={index}
+                      initial={{ opacity: 0, x: -30 }}
+                      whileInView={{ opacity: 1, x: 0 }}
+                      viewport={{ once: true }}
+                      transition={{ duration: 0.6, delay: index * 0.1 }}
                     >
-                      {item.title}
-                    </p>
-                  </div>
-                  <div className="flex-shrink-0">
-                    <span
-                      className={`text-xs font-semibold px-3 py-1 rounded-full ${
-                        item.status === "completed"
-                          ? "bg-success text-success-foreground"
-                          : item.status === "in-progress"
-                          ? "bg-primary text-primary-foreground"
-                          : "bg-muted text-muted-foreground"
-                      }`}
-                    >
-                      {item.status === "completed"
-                        ? "Concluído"
-                        : item.status === "in-progress"
-                        ? "Em Progresso"
-                        : "Em Breve"}
-                    </span>
-                  </div>
-                </motion.div>
-              ))}
-            </div>
+                      <AccordionItem
+                        value={`item-${index}`}
+                        className={`rounded-2xl border transition-all ${
+                          item.status === "completed"
+                            ? "bg-success/5 border-success/30"
+                            : item.status === "in-progress"
+                            ? "bg-primary/5 border-primary/30"
+                            : "bg-muted/50 border-border"
+                        }`}
+                      >
+                        <AccordionTrigger
+                          disabled={!hasDescription}
+                          className="p-6 text-left hover:no-underline [&[data-state=open]>svg]:rotate-180"
+                        >
+                          <div className="flex items-center gap-4 w-full">
+                            <div className="flex-shrink-0">
+                              {item.status === "completed" ? (
+                                <CheckCircle2
+                                  className="text-success"
+                                  size={24}
+                                />
+                              ) : item.status === "in-progress" ? (
+                                <GitBranch className="text-primary" size={24} />
+                              ) : (
+                                <Circle
+                                  className="text-muted-foreground/50"
+                                  size={24}
+                                />
+                              )}
+                            </div>
+                            <div className="flex-1">
+                              <p
+                                className={`text-lg font-medium ${
+                                  item.status === "completed"
+                                    ? "text-foreground"
+                                    : item.status === "in-progress"
+                                    ? "text-primary"
+                                    : "text-muted-foreground"
+                                }`}
+                              >
+                                {item.title}
+                              </p>
+                            </div>
+                          </div>
+                        </AccordionTrigger>
+                        <AccordionContent className="px-6 pb-6">
+                          <ul className="list-disc space-y-2 pl-10 text-muted-foreground">
+                            {item.description?.map((point, i) => (
+                              <li key={i}>{point}</li>
+                            ))}
+                          </ul>
+                        </AccordionContent>
+                      </AccordionItem>
+                    </motion.div>
+                  );
+                })}
+              </Accordion>
+            </motion.div>
           </div>
         </section>
 
