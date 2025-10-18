@@ -7,8 +7,7 @@
     "build": "next build --turbopack",
     "start": "next start",
     "lint": "eslint",
-    "shadcn:add": "yarn dlx shadcn@latest add",
-    "gen:types": "npx supabase gen types typescript --project-id fsenvimdwsbdyeognrug > integrations/supabase/types.ts"
+    "shadcn:add": "yarn dlx shadcn@latest add"
   },
   "dependencies": {
     "@radix-ui/react-accordion": "^1.2.12",
