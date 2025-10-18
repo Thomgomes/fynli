@@ -22,7 +22,6 @@ export default function SettingsLayout({
 
   return (
     <div className="flex flex-col md:flex-row gap-10">
-      {/* O Menu Lateral Aninhado */}
       <aside className="w-full md:w-1/4 lg:w-1/5 flex-shrink-0">
         <nav className="flex flex-row md:flex-col gap-2">
           {settingsNav.map((item) => (
@@ -40,10 +39,10 @@ export default function SettingsLayout({
               <span className="truncate">{item.title}</span>
             </Link>
           ))}
+          
         </nav>
       </aside>
 
-      {/* O Conteúdo da Página (ex: profile, theme) será renderizado aqui */}
       <div className="flex-1 min-w-0">
         {children}
       </div>
