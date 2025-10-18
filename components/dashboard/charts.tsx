@@ -92,7 +92,7 @@ export function DashboardCharts({ selectedYear, selectedMonth, onYearChange, onM
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-wrap items-center gap-4">
+      <div className="flex flex-wrap items-center justify-center md:justify-start gap-4">
         <div className="flex items-center gap-2">
           <Label className="font-medium">Ano:</Label>
           <Select value={selectedYear || ''} onValueChange={(val) => { onYearChange(val); onMonthChange('todos'); }}>
