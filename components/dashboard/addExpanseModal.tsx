@@ -150,8 +150,9 @@ export function AddExpenseModal({
               date: editingExpense
                 ? new Date(editingExpense.date).toISOString().split("T")[0]
                 : new Date().toISOString().split("T")[0],
-              person_id: editingExpense?.person_id || defaultPersonId || '',
-              category_id: editingExpense?.category_id || defaultCategoryId || '',
+              person_id: editingExpense?.person_id || defaultPersonId || "",
+              category_id:
+                editingExpense?.category_id || defaultCategoryId || "",
               payment_method: editingExpense?.payment_method || "credito",
               reimbursement_status:
                 editingExpense?.reimbursement_status || "pending",
@@ -179,7 +180,9 @@ export function AddExpenseModal({
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <Label htmlFor="amount">Valor Total (R$)</Label>
+                    <Label htmlFor="amount" className="text-nowrap">
+                      Valor Total (R$)
+                    </Label>
                     <Field
                       as={Input}
                       name="amount"
@@ -194,8 +197,16 @@ export function AddExpenseModal({
                     ) : null}
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="date">Data da 1ª Parcela</Label>
-                    <Field as={Input} name="date" id="date" type="date" />
+                    <Label htmlFor="date" className="text-nowrap">
+                      Data da 1ª Parcela
+                    </Label>
+                    <Field
+                      as={Input}
+                      name="date"
+                      id="date"
+                      type="date"
+                      className="w-full xs:[&::-webkit-calendar-picker-indicator]:absolute xs:[&::-webkit-calendar-picker-indicator]:right-8 xs:[&::-webkit-calendar-picker-indicator]:cursor-pointer"
+                    />
                     {errors.date && touched.date ? (
                       <p className="text-sm text-destructive">{errors.date}</p>
                     ) : null}
@@ -212,7 +223,7 @@ export function AddExpenseModal({
                           }
                           defaultValue={field.value}
                         >
-                          <SelectTrigger>
+                          <SelectTrigger className="w-full">
                             <SelectValue placeholder="Selecione..." />
                           </SelectTrigger>
                           <SelectContent>
@@ -252,7 +263,7 @@ export function AddExpenseModal({
                           }
                           defaultValue={field.value}
                         >
-                          <SelectTrigger>
+                          <SelectTrigger className="w-full">
                             <SelectValue placeholder="Selecione..." />
                           </SelectTrigger>
                           <SelectContent>
@@ -294,7 +305,7 @@ export function AddExpenseModal({
                           }
                           defaultValue={field.value}
                         >
-                          <SelectTrigger>
+                          <SelectTrigger className="w-full">
                             <SelectValue placeholder="Selecione..." />
                           </SelectTrigger>
                           <SelectContent>
@@ -318,7 +329,7 @@ export function AddExpenseModal({
                           }
                           defaultValue={field.value}
                         >
-                          <SelectTrigger>
+                          <SelectTrigger className="w-full">
                             <SelectValue placeholder="Selecione..." />
                           </SelectTrigger>
                           <SelectContent>
