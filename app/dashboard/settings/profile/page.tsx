@@ -86,7 +86,7 @@ export default function ProfileSettingsPage() {
             <Card>
               <CardHeader>
                 <CardTitle>Perfil</CardTitle>
-                <CardDescription>Atualize seu nome de exibição e e-mail.</CardDescription>
+                <CardDescription>Atualize seu nome de usuário.</CardDescription>
               </CardHeader>
               <CardContent className="space-y-6">
                 <div className="space-y-2">
@@ -95,7 +95,7 @@ export default function ProfileSettingsPage() {
                 </div>
                 
                 <div className="space-y-2">
-                  <Label htmlFor="name">Nome de Exibição</Label>
+                  <Label htmlFor="name">Nome de Usuário</Label>
                   <Field as={Input} name="name" id="name" placeholder="Digite seu nome..." />
                   <ErrorMessage name="name" component="p" className="text-sm text-destructive" />
                 </div>
