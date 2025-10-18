@@ -1,345 +1,187 @@
 "use client";
 
-import { useState } from "react";
-import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import {
-  Users,
-  TrendingUp,
-  Receipt,
-  ArrowRight,
-  DollarSign,
-  UserPlus,
-  BarChart3,
-} from "lucide-react";
+import React from "react";
 import Link from "next/link";
-import { FynliSVG } from "@/components/fynliSVG";
-import { ThemeButton } from "@/components/themeButton";
-import Footer from "@/components/footer";
+import { useAuth } from "@/contexts/AuthContext";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { CheckCircle, BarChart3, Users, GitBranch, ArrowRight, PackagePlus } from "lucide-react";
+import { Skeleton } from "@/components/ui/skeleton";
 
-export default function DemoPage() {
-  const [activeDemo, setActiveDemo] = useState<
-    "dashboard" | "expenses" | "people"
-  >("dashboard");
+// --- Componente de Ação do Cabeçalho (com Verificação de Auth) ---
+function HeaderActions() {
+  const { user, isLoading } = useAuth();
 
-  const demoData = {
-    dashboard: {
-      totalExpenses: "R$ 2.540,00",
-      totalPeople: 4,
-      avgPerPerson: "R$ 635,00",
-      recentTransactions: [
-        {
-          person: "João",
-          amount: "R$ 120,00",
-          description: "Almoço",
-          date: "Hoje",
-        },
-        {
-          person: "Maria",
-          amount: "R$ 85,00",
-          description: "Mercado",
-          date: "Ontem",
-        },
-        {
-          person: "Pedro",
-          amount: "R$ 200,00",
-          description: "Combustível",
-          date: "2 dias",
-        },
-      ],
-    },
-    expenses: [
-      {
-        id: 1,
-        description: "Supermercado",
-        amount: 150.0,
-        person: "João",
-        date: "2024-01-15",
-      },
-      {
-        id: 2,
-        description: "Restaurante",
-        amount: 85.0,
-        person: "Maria",
-        date: "2024-01-14",
-      },
-      {
-        id: 3,
-        description: "Combustível",
-        amount: 200.0,
-        person: "Pedro",
-        date: "2024-01-13",
-      },
-    ],
-    people: [
-      { id: 1, name: "João Silva", totalSpent: 450.0, transactions: 12 },
-      { id: 2, name: "Maria Santos", totalSpent: 320.0, transactions: 8 },
-      { id: 3, name: "Pedro Costa", totalSpent: 780.0, transactions: 15 },
-      { id: 4, name: "Ana Oliveira", totalSpent: 290.0, transactions: 6 },
-    ],
-  };
+  if (isLoading) {
+    return <Skeleton className="h-10 w-28" />;
+  }
+
+  if (user) {
+    return (
+      <Button asChild>
+        <Link href="/dashboard">Aceder ao Dashboard</Link>
+      </Button>
+    );
+  }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background to-background/80">
-      <header className="border-b bg-card/50 backdrop-blur-sm">
-        <div className="container mx-auto px-4 py-4 flex justify-between items-center">
-          <div className="flex items-center gap-2">
-            <FynliSVG className="h-8 w-8 text-primary" />
-            <h1 className="text-2xl font-bold">Fynli</h1>
-          </div>
-          <div className="flex gap-2">
-            <ThemeButton />
-            <Button variant="ghost" asChild>
-              <Link href="/auth">Entrar</Link>
-            </Button>
-          </div>
+    <div className="flex gap-2">
+      <Button variant="ghost" asChild>
+        <Link href="/auth">Entrar</Link>
+      </Button>
+      <Button asChild>
+        <Link href="/auth">Começar Grátis</Link>
+      </Button>
+    </div>
+  );
+}
+
+// --- Componente Principal da Página de Demonstração ---
+export default function DemoPage() {
+  const features = [
+    {
+      icon: Users,
+      title: "Organização por Perfil",
+      description: "Crie perfis personalizados (Mãe, Pai, Casa) com cores e ícones para saber exatamente para onde seu dinheiro está indo."
+    },
+    {
+      icon: "📅", // Usando um emoji para a "feature matadora"
+      title: "Lógica de Parcelamento Real",
+      description: "Lance um gasto de R$300 em 3x e o Fynli cria automaticamente três despesas de R$100 para os próximos meses. Seus relatórios finalmente estarão corretos."
+    },
+    {
+      icon: BarChart3,
+      title: "Dashboard Dinâmico e Interativo",
+      description: "Filtre seus gastos por ano ou mês. Gráficos, cards e listas se atualizam instantaneamente, sem recarregar a página, graças à SWR e funções RPC no Supabase."
+    },
+    {
+      icon: PackagePlus,
+      title: "Criação Rápida",
+      description: "Percebeu que falta uma categoria ou perfil? Crie-os na hora, de dentro do próprio formulário de despesa, sem interromper seu fluxo."
+    }
+  ];
+
+  const roadmap = [
+    { title: "Lançamento em Lote", description: "Adicione múltiplos gastos de uma só vez, perfeito para organizar seu extrato bancário." },
+    { title: "Módulo de Orçamentos", description: "Defina limites de gastos por perfil ou categoria e acompanhe seu progresso." },
+    { title: "Anexar Comprovantes", description: "Faça upload de recibos e notas fiscais para cada transação usando o Supabase Storage." },
+  ];
+
+  return (
+    <div className="flex flex-col min-h-screen bg-background text-foreground">
+      {/* --- Cabeçalho --- */}
+      <header className="sticky top-0 z-50 w-full border-b bg-card/95 backdrop-blur-sm">
+        <div className="container mx-auto h-16 flex items-center justify-between px-4 md:px-6">
+          <Link href="/" className="flex items-center gap-2">
+            <h1 className="text-xl font-bold text-primary">Fynli</h1>
+          </Link>
+          <HeaderActions />
         </div>
       </header>
 
-      <section className="py-20 px-4">
-        <div className="container mx-auto text-center">
-          <Badge variant="secondary" className="mb-4">
-            Gerenciamento de Gastos Inteligente
-          </Badge>
-          <h2 className="text-2xl sm:text-4xl md:text-6xl min-h-20 font-bold mb-6 bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
-            Controle seus gastos compartilhados
-          </h2>
-          <p className="text-xl text-muted-foreground mb-8 max-w-2xl mx-auto">
-            Gerencie despesas em grupo, divida contas de forma justa e acompanhe
-            seus gastos com gráficos detalhados e relatórios inteligentes
-          </p>
-          <div className="flex gap-4 justify-center mb-12">
+      {/* --- Seção Hero --- */}
+      <main className="flex-1">
+        <section className="py-20 md:py-32 border-b">
+          <div className="container mx-auto text-center px-4 md:px-6">
+            <h2 className="text-4xl md:text-6xl font-bold tracking-tight mb-6">
+              Misturando seus gastos com os da sua família?
+            </h2>
+            <p className="text-xl md:text-2xl text-muted-foreground mb-10 max-w-3xl mx-auto">
+              O Fynli organiza essa confusão. Crie perfis, registe despesas (incluindo parcelamentos!) e finalmente entenda para onde seu dinheiro está indo.
+            </p>
+            <div className="flex justify-center">
+              <Button size="lg" asChild>
+                <Link href="/auth" className="gap-2">
+                  Começar a Organizar (Grátis)
+                  <ArrowRight className="h-5 w-5" />
+                </Link>
+              </Button>
+            </div>
+            {/* Aqui você pode adicionar um print do seu app */}
+            <div className="mt-16">
+              <img 
+                src="/path/to/your/dashboard-screenshot.png" 
+                alt="Dashboard do Fynli" 
+                className="rounded-lg border shadow-lg mx-auto"
+              />
+            </div>
+          </div>
+        </section>
+
+        {/* --- Seção de Funcionalidades --- */}
+        <section className="py-20 md:py-32 bg-muted/50">
+          <div className="container mx-auto px-4 md:px-6">
+            <div className="text-center mb-16">
+              <h3 className="text-3xl md:text-4xl font-bold">Tudo que o Fynli faz por você</h3>
+              <p className="text-lg text-muted-foreground mt-4">Construído com base em uma necessidade real, focado em performance.</p>
+            </div>
+            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+              {features.map((feature) => (
+                <div key={feature.title} className="flex flex-col items-center text-center">
+                  <div className="flex h-12 w-12 items-center justify-center rounded-full bg-primary/10 text-primary mb-4">
+                    {typeof feature.icon === 'string' ? (
+                      <span className="text-2xl">{feature.icon}</span>
+                    ) : (
+                      <feature.icon className="h-6 w-6" />
+                    )}
+                  </div>
+                  <h4 className="text-xl font-semibold mb-2">{feature.title}</h4>
+                  <p className="text-muted-foreground">{feature.description}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+        
+        {/* --- Seção de Roadmap (Próximas Atualizações) --- */}
+        <section className="py-20 md:py-32">
+          <div className="container mx-auto px-4 md:px-6">
+            <div className="text-center mb-16 max-w-2xl mx-auto">
+              <h3 className="text-3xl md:text-4xl font-bold">Próximas Atualizações</h3>
+              <p className="text-lg text-muted-foreground mt-4">
+                O Fynli é um projeto vivo. Aqui está o que vem por aí para tornar o controle financeiro ainda mais completo.
+              </p>
+            </div>
+            <div className="grid md:grid-cols-3 gap-8">
+              {roadmap.map((item) => (
+                <Card key={item.title}>
+                  <CardHeader>
+                    <GitBranch className="h-6 w-6 text-primary mb-4" />
+                    <CardTitle>{item.title}</CardTitle>
+                    <CardDescription>{item.description}</CardDescription>
+                  </CardHeader>
+                </Card>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* --- Seção Final de CTA --- */}
+        <section className="py-20 md:py-32 border-t bg-gradient-to-t from-muted/50 to-background">
+          <div className="container mx-auto text-center px-4 md:px-6">
+            <h2 className="text-4xl md:text-5xl font-bold tracking-tight mb-6">
+              Pronto para organizar sua vida financeira?
+            </h2>
+            <p className="text-xl text-muted-foreground mb-10 max-w-2xl mx-auto">
+              Crie sua conta gratuita em 60 segundos. Comece a ter clareza sobre seus gastos hoje mesmo.
+            </p>
             <Button size="lg" asChild>
               <Link href="/auth" className="gap-2">
-                Experimentar Grátis <ArrowRight className="h-4 w-4" />
+                Começar Grátis
+                <ArrowRight className="h-5 w-5" />
               </Link>
             </Button>
-            <Button size="lg" variant="outline">
-              <a href="#demo">Ver Demonstração</a>
-            </Button>
           </div>
+        </section>
+      </main>
+
+      {/* --- Rodapé --- */}
+      <footer className="py-8 border-t">
+        <div className="container mx-auto text-center text-muted-foreground px-4 md:px-6">
+          <p>&copy; {new Date().getFullYear()} Fynli. Todos os direitos reservados.</p>
+          <p>Desenvolvido por [Seu Nome Aqui]</p>
         </div>
-      </section>
-
-      <section className="py-16 px-4 bg-card/30">
-        <div className="container mx-auto">
-          <h3 className="text-3xl font-bold text-center mb-12">
-            Principais Funcionalidades
-          </h3>
-          <div className="grid md:grid-cols-3 gap-8">
-            <Card className="text-center">
-              <CardHeader>
-                <Users className="h-12 w-12 text-primary mx-auto mb-4" />
-                <CardTitle>Gestão de Pessoas</CardTitle>
-                <CardDescription>
-                  Adicione pessoas e acompanhe os gastos individuais de cada
-                  membro do grupo
-                </CardDescription>
-              </CardHeader>
-            </Card>
-
-            <Card className="text-center">
-              <CardHeader>
-                <BarChart3 className="h-12 w-12 text-primary mx-auto mb-4" />
-                <CardTitle>Gráficos Detalhados</CardTitle>
-                <CardDescription>
-                  Visualize tendências de gastos com gráficos interativos e
-                  relatórios mensais
-                </CardDescription>
-              </CardHeader>
-            </Card>
-
-            <Card className="text-center">
-              <CardHeader>
-                <Receipt className="h-12 w-12 text-primary mx-auto mb-4" />
-                <CardTitle>Controle de Despesas</CardTitle>
-                <CardDescription>
-                  Registre gastos facilmente e mantenha um histórico completo de
-                  todas as transações
-                </CardDescription>
-              </CardHeader>
-            </Card>
-          </div>
-        </div>
-      </section>
-
-      <section className="py-16 px-4" id="demo">
-        <div className="container mx-auto">
-          <h3 className="text-3xl font-bold text-center mb-8">
-            Veja como funciona
-          </h3>
-
-          <div className="flex justify-center gap-4 mb-8">
-            <Button
-              variant={activeDemo === "dashboard" ? "default" : "outline"}
-              onClick={() => setActiveDemo("dashboard")}
-              className="gap-2"
-            >
-              <TrendingUp className="h-4 w-4" />
-              Dashboard
-            </Button>
-            <Button
-              variant={activeDemo === "expenses" ? "default" : "outline"}
-              onClick={() => setActiveDemo("expenses")}
-              className="gap-2"
-            >
-              <Receipt className="h-4 w-4" />
-              Gastos
-            </Button>
-            <Button
-              variant={activeDemo === "people" ? "default" : "outline"}
-              onClick={() => setActiveDemo("people")}
-              className="gap-2"
-            >
-              <Users className="h-4 w-4" />
-              Pessoas
-            </Button>
-          </div>
-
-          <div className="max-w-4xl mx-auto">
-            {activeDemo === "dashboard" && (
-              <div className="grid md:grid-cols-3 gap-6">
-                <Card>
-                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                    <CardTitle className="text-sm font-medium">
-                      Total de Gastos
-                    </CardTitle>
-                    <DollarSign className="h-4 w-4 text-muted-foreground" />
-                  </CardHeader>
-                  <CardContent>
-                    <div className="text-2xl font-bold">
-                      {demoData.dashboard.totalExpenses}
-                    </div>
-                    <p className="text-xs text-muted-foreground">
-                      +12% do mês passado
-                    </p>
-                  </CardContent>
-                </Card>
-
-                <Card>
-                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                    <CardTitle className="text-sm font-medium">
-                      Pessoas
-                    </CardTitle>
-                    <Users className="h-4 w-4 text-muted-foreground" />
-                  </CardHeader>
-                  <CardContent>
-                    <div className="text-2xl font-bold">
-                      {demoData.dashboard.totalPeople}
-                    </div>
-                    <p className="text-xs text-muted-foreground">
-                      Ativos no grupo
-                    </p>
-                  </CardContent>
-                </Card>
-
-                <Card>
-                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                    <CardTitle className="text-sm font-medium">
-                      Média por Pessoa
-                    </CardTitle>
-                    <UserPlus className="h-4 w-4 text-muted-foreground" />
-                  </CardHeader>
-                  <CardContent>
-                    <div className="text-2xl font-bold">
-                      {demoData.dashboard.avgPerPerson}
-                    </div>
-                    <p className="text-xs text-muted-foreground">Este mês</p>
-                  </CardContent>
-                </Card>
-              </div>
-            )}
-
-            {activeDemo === "expenses" && (
-              <Card>
-                <CardHeader>
-                  <CardTitle>Gastos Recentes</CardTitle>
-                  <CardDescription>
-                    Últimas transações registradas
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-4">
-                    {demoData.expenses.map((expense) => (
-                      <div
-                        key={expense.id}
-                        className="flex justify-between items-center p-4 border rounded-lg"
-                      >
-                        <div>
-                          <p className="font-medium">{expense.description}</p>
-                          <p className="text-sm text-muted-foreground">
-                            {expense.person} • {expense.date}
-                          </p>
-                        </div>
-                        <div className="font-bold text-lg">
-                          R$ {expense.amount.toFixed(2)}
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </CardContent>
-              </Card>
-            )}
-
-            {activeDemo === "people" && (
-              <Card>
-                <CardHeader>
-                  <CardTitle>Pessoas do Grupo</CardTitle>
-                  <CardDescription>
-                    Gastos por pessoa no período
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-4">
-                    {demoData.people.map((person) => (
-                      <div
-                        key={person.id}
-                        className="flex justify-between items-center p-4 border rounded-lg"
-                      >
-                        <div>
-                          <p className="font-medium">{person.name}</p>
-                          <p className="text-sm text-muted-foreground">
-                            {person.transactions} transações
-                          </p>
-                        </div>
-                        <div className="text-right">
-                          <div className="font-bold text-lg">
-                            R$ {person.totalSpent.toFixed(2)}
-                          </div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </CardContent>
-              </Card>
-            )}
-          </div>
-        </div>
-      </section>
-
-      <section className="py-16 px-4 bg-primary/5">
-        <div className="container mx-auto text-center">
-          <h3 className="text-3xl font-bold mb-4">Pronto para começar?</h3>
-          <p className="text-lg text-muted-foreground mb-8 max-w-2xl mx-auto">
-            Junte-se a milhares de usuários que já estão organizando seus gastos
-            de forma inteligente
-          </p>
-          <Button size="lg" asChild>
-            <Link href="/auth" className="gap-2">
-              Criar Conta Grátis <ArrowRight className="h-4 w-4" />
-            </Link>
-          </Button>
-        </div>
-      </section>
-
-      <Footer />
+      </footer>
     </div>
   );
 }
