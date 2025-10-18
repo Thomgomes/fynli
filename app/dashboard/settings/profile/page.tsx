@@ -2,7 +2,7 @@
 
 import React from "react";
 import { useAuth } from "@/contexts/AuthContext";
-import { Formik, Form, Field, FormikHelpers } from 'formik';
+import { Formik, Form, Field, FormikHelpers, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -10,10 +10,12 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
+import { useProfile } from "@/hooks/use-profile-settings";
+import { Skeleton } from "@/components/ui/skeleton";
 
 // Schema para o formulário de atualização de nome
 const ProfileSchema = Yup.object().shape({
-  name: Yup.string().min(2, 'Muito curto!').required('O nome é obrigatório'),
+  name: Yup.string().min(2, 'Nome muito curto!').required('O nome é obrigatório'),
 });
 
 // Schema para o formulário de atualização de senha
@@ -24,25 +26,31 @@ const PasswordSchema = Yup.object().shape({
     .required('Confirme sua nova senha'),
 });
 
+interface PasswordFormValues {
+  password: string;
+  confirmPassword: string;
+}
+
 export default function ProfileSettingsPage() {
-  const { user, updatePassword } = useAuth();
+  const { user, updatePassword } = useAuth(); 
+  const { profile, isLoading, updateProfile } = useProfile();
+
+  // O nome do Google é apenas um fallback para o valor inicial
+  const googleName = user?.user_metadata?.display_name || user?.user_metadata?.full_name;
 
   const handleUpdateName = async (values: { name: string }, { setSubmitting }: FormikHelpers<{ name: string }>) => {
-    const { error } = await supabase.auth.updateUser({
-      data: { display_name: values.name }
+    // Agora só atualizamos o 'display_name' na nossa tabela 'profiles'
+    await updateProfile({ 
+      display_name: values.name,
     });
-    
-    if (error) {
-      toast.error("Erro ao atualizar o nome.", { description: error.message });
-    } else {
-      toast.success("Nome atualizado com sucesso!");
-    }
     setSubmitting(false);
   };
 
-  const handleUpdatePassword = async (values: { password: string }, { setSubmitting, resetForm }: FormikHelpers<{ password: string }>) => {
-    const { error } = await updatePassword(values.password);
-
+  const handleUpdatePassword = async (
+    values: PasswordFormValues, 
+    { setSubmitting, resetForm }: FormikHelpers<PasswordFormValues>
+  ) => {
+    const { error } = await updatePassword(values.password); 
     if (error) {
       toast.error("Erro ao atualizar a senha.", { description: error.message });
     } else {
@@ -52,38 +60,50 @@ export default function ProfileSettingsPage() {
     setSubmitting(false);
   };
 
+  if (isLoading || !user) {
+    return (
+      <div className="space-y-8">
+        <Card><CardHeader><Skeleton className="h-6 w-32" /></CardHeader><CardContent><Skeleton className="h-40 w-full" /></CardContent></Card>
+        <Card><CardHeader><Skeleton className="h-6 w-32" /></CardHeader><CardContent><Skeleton className="h-40 w-full" /></CardContent></Card>
+      </div>
+    )
+  }
+  
+  // O nome de exibição é o do nosso 'profile' ou, como fallback, o do Google.
+  const currentDisplayName = profile?.display_name || googleName || '';
+
   return (
     <div className="space-y-8">
-      {/* Card 1: Atualização de Perfil */}
+      {/* Card 1: Atualização de Perfil (AGORA SÓ UM FORMULÁRIO) */}
       <Formik
-        initialValues={{ name: user?.user_metadata?.display_name || '' }}
+        initialValues={{ name: currentDisplayName }}
         validationSchema={ProfileSchema}
         onSubmit={handleUpdateName}
         enableReinitialize
       >
-        {({ isSubmitting, errors, touched }) => (
+        {({ isSubmitting }) => (
           <Form>
             <Card>
               <CardHeader>
                 <CardTitle>Perfil</CardTitle>
-                <CardDescription>Atualize seu nome de exibição.</CardDescription>
+                <CardDescription>Atualize seu nome de exibição e e-mail.</CardDescription>
               </CardHeader>
-              <CardContent className="space-y-4">
+              <CardContent className="space-y-6">
                 <div className="space-y-2">
                   <Label htmlFor="email">E-mail</Label>
-                  <Input id="email" value={user?.email || ''} disabled />
-                  <p className="text-xs text-muted-foreground">O e-mail da conta não pode ser alterado.</p>
+                  <Input id="email" value={user.email || ''} disabled />
                 </div>
+                
                 <div className="space-y-2">
                   <Label htmlFor="name">Nome de Exibição</Label>
-                  <Field as={Input} name="name" id="name" />
-                  {errors.name && touched.name ? <p className="text-sm text-destructive">{errors.name}</p> : null}
+                  <Field as={Input} name="name" id="name" placeholder="Digite seu nome..." />
+                  <ErrorMessage name="name" component="p" className="text-sm text-destructive" />
                 </div>
               </CardContent>
               <CardFooter>
                 <Button type="submit" disabled={isSubmitting}>
                   {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                  Salvar Alterações
+                  Salvar Perfil
                 </Button>
               </CardFooter>
             </Card>
@@ -97,7 +117,7 @@ export default function ProfileSettingsPage() {
         validationSchema={PasswordSchema}
         onSubmit={handleUpdatePassword}
       >
-        {({ isSubmitting, errors, touched }) => (
+        {({ isSubmitting }) => (
           <Form>
             <Card>
               <CardHeader>
@@ -108,12 +128,12 @@ export default function ProfileSettingsPage() {
                 <div className="space-y-2">
                   <Label htmlFor="password">Nova Senha</Label>
                   <Field as={Input} name="password" id="password" type="password" />
-                  {errors.password && touched.password ? <p className="text-sm text-destructive">{errors.password}</p> : null}
+                  <ErrorMessage name="password" component="p" className="text-sm text-destructive" />
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="confirmPassword">Confirmar Nova Senha</Label>
                   <Field as={Input} name="confirmPassword" id="confirmPassword" type="password" />
-                  {errors.confirmPassword && touched.confirmPassword ? <p className="text-sm text-destructive">{errors.confirmPassword}</p> : null}
+                  <ErrorMessage name="confirmPassword" component="p" className="text-sm text-destructive" />
                 </div>
               </CardContent>
               <CardFooter>
