@@ -31,7 +31,6 @@ export interface TransactionsResponse {
 
 const PAGE_SIZE = 10;
 
-// ✅ CORREÇÃO 1: Fetcher simplificado que recebe os parâmetros diretamente
 const fetcher = async (
   userId: string,
   filters: TransactionFilters,
@@ -70,7 +69,6 @@ const fetcher = async (
 export function useTransactions(filters: TransactionFilters) {
   const { user } = useAuth();
 
-  // ✅ CORREÇÃO 2: Cria uma chave estável para os filtros usando JSON.stringify
   const filterKey = useMemo(() => {
     return JSON.stringify({
       personId: filters.personId,
@@ -80,15 +78,12 @@ export function useTransactions(filters: TransactionFilters) {
     });
   }, [filters.personId, filters.categoryId, filters.dateRange?.from, filters.dateRange?.to]);
 
-  // ✅ CORREÇÃO 3: getKey otimizado que usa string como base
   const getKey = useCallback(
     (pageIndex: number, previousPageData: TransactionsResponse | null) => {
       if (!user) return null;
       
-      // Para após a última página
       if (previousPageData && !previousPageData.transactions.length) return null;
       
-      // Chave única e estável
       return `transactions_${user.id}_${filterKey}_page_${pageIndex}`;
     },
     [user, filterKey]
@@ -98,22 +93,19 @@ export function useTransactions(filters: TransactionFilters) {
     getKey,
     (_key) => {
       if (!user) return Promise.resolve({ transactions: [], count: 0 });
-      
-      // Extrai pageIndex da chave
+
       const match = _key.match(/_page_(\d+)$/);
       const pageIndex = match ? parseInt(match[1], 10) : 0;
       
       return fetcher(user.id, filters, pageIndex, PAGE_SIZE);
     },
     {
-      // ✅ CORREÇÃO 4: Configurações otimizadas
       revalidateOnFocus: false,
       revalidateOnReconnect: false,
       revalidateIfStale: false,
-      revalidateFirstPage: false, // Não revalida a primeira página ao mudar de página
-      persistSize: true,          // Mantém o tamanho ao revalidar
+      revalidateFirstPage: false, 
+      persistSize: true,         
       dedupingInterval: 5000,
-      // parallel: true,          // Descomente para carregar páginas em paralelo
     }
   );
 
@@ -125,7 +117,6 @@ export function useTransactions(filters: TransactionFilters) {
   const totalCount = data?.[0]?.count ?? 0;
   const hasMore = transactions.length < totalCount;
 
-  // ✅ CORREÇÃO 5: Otimização com atualizações otimistas
   const addTransaction = useCallback(
     async (values: any) => {
       if (!user) throw new Error("Usuário não autenticado.");
@@ -163,7 +154,6 @@ export function useTransactions(filters: TransactionFilters) {
 
       toast.success("Despesa adicionada com sucesso!");
       
-      // ✅ Revalida apenas a primeira página
       await mutate();
     },
     [user, mutate]
@@ -171,7 +161,6 @@ export function useTransactions(filters: TransactionFilters) {
 
   const deleteTransaction = useCallback(
     async (id: string) => {
-      // ✅ CORREÇÃO 6: Update otimista
       const optimisticData = data?.map(page => ({
         ...page,
         transactions: page.transactions.filter(t => t.id !== id),
@@ -187,12 +176,11 @@ export function useTransactions(filters: TransactionFilters) {
           }
           toast.success("Transação deletada com sucesso.");
           
-          // Retorna os dados atualizados
           return optimisticData;
         },
         {
           optimisticData,
-          revalidate: true, // Revalida para garantir consistência
+          revalidate: true,
         }
       );
     },
@@ -201,7 +189,6 @@ export function useTransactions(filters: TransactionFilters) {
 
   const updateTransaction = useCallback(
     async (id: string, updates: TablesUpdate<'expenses'>) => {
-      // ✅ Update otimista
       const optimisticData = data?.map(page => ({
         ...page,
         transactions: page.transactions.map(t =>
