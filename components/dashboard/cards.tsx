@@ -57,29 +57,29 @@ export function DashboardCards({ year, month }: DashboardCardsProps) {
       description: `no período selecionado` 
     },
     { 
-      title: "Gasto Total (Geral)", 
-      value: formatCurrency(stats.total_all_time), 
-      icon: PiggyBank, 
-      description: "desde o início" 
-    },
-    { 
       title: "Perfil com Mais Gastos", 
       value: stats.top_person_name || 'Nenhum', 
       icon: Users, 
       description: `com ${formatCurrency(stats.top_person_amount)} ${periodLabel}`
     },
+    { 
+      title: "Gasto Total (Geral)", 
+      value: formatCurrency(stats.total_all_time), 
+      icon: PiggyBank, 
+      description: "desde o início" 
+    },
   ];
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+    <div className="flex justify-between flex-wrap gap-6">
       {cards.map((card) => (
-        <Card key={card.title}>
+        <Card key={card.title} className="w-full min-w-[240px] flex-1">
           <CardHeader className="flex flex-row items-center justify-between">
             <CardTitle className="text-sm font-medium text-muted-foreground">{card.title}</CardTitle>
             <card.icon className="h-5 w-5 text-muted-foreground" />
           </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-foreground">{card.value}</div>
+          <CardContent className="-mt-3 md:-mt-2">
+            <div className="text-2xl md:text-3xl font-bold text-foreground">{card.value}</div>
             <p className="text-xs text-muted-foreground">{card.description}</p>
           </CardContent>
         </Card>
