@@ -6,35 +6,36 @@ import {
 } from 'lucide-react';
 
 export type Icon = {
-  name: string;
+  key: string;
+ label: string;
   component: LucideIcon;
 };
 
 // Nossa lista curada de ícones disponíveis para o usuário
 export const availableIcons: Icon[] = [
-  { name: 'Carrinho de Compras', component: ShoppingCart },
-  { name: 'Talheres', component: UtensilsCrossed },
-  { name: 'Café', component: Coffee },
-  { name: 'Pizza', component: Pizza },
-  { name: 'Gamepad2', component: Gamepad2 },
-  { name: 'Filme', component: Film },
-  { name: 'Cachorro', component: Dog },
-  { name: 'Pata', component: PawPrint },
-  { name: 'Carro', component: Car },
-  { name: 'Ônibus', component: Bus },
-  { name: 'Avião', component: Plane },
-  { name: 'Combustivel', component: Fuel },
-  { name: 'Presente', component: Gift },
-  { name: 'Casa', component: Home },
-  { name: 'Camisa', component: Shirt },
-  { name: 'Saúde', component: HeartPulse },
-  { name: 'Chapéu', component: GraduationCap },
-  { name: 'Livro', component: BookOpen },
-  { name: 'Banco', component: Landmark },
-  { name: 'HandCoins', component: HandCoins },
-  { name: 'Puzzle', component: Puzzle },
+  { key: 'ShoppingCart', label: 'Carrinho de Compras', component: ShoppingCart },
+  { key: 'UtensilsCrossed', label: 'Talheres', component: UtensilsCrossed },
+  { key: 'Coffee', label: 'Café', component: Coffee },
+  { key: 'Pizza', label: 'Pizza', component: Pizza },
+  { key: 'Gamepad2', label: 'Gamepad', component: Gamepad2 },
+  { key: 'Film', label: 'Filme', component: Film },
+  { key: 'Dog', label: 'Cachorro', component: Dog },
+  { key: 'PawPrint', label: 'Pata', component: PawPrint },
+  { key: 'Car', label: 'Carro', component: Car },
+  { key: 'Bus', label: 'Ônibus', component: Bus },
+  { key: 'Plane', label: 'Avião', component: Plane },
+  { key: 'Fuel', label: 'Combustível', component: Fuel },
+  { key: 'Gift', label: 'Presente', component: Gift },
+  { key: 'Home', label: 'Casa', component: Home },
+  { key: 'Shirt', label: 'Roupas', component: Shirt },
+  { key: 'HeartPulse', label: 'Saúde', component: HeartPulse },
+  { key: 'GraduationCap', label: 'Educação', component: GraduationCap },
+  { key: 'BookOpen', label: 'Livro', component: BookOpen },
+  { key: 'Landmark', label: 'Banco', component: Landmark },
+  { key: 'HandCoins', label: 'Moedas', component: HandCoins },
+  { key: 'Puzzle', label: 'Puzzle/Jogos', component: Puzzle },
 ];
 
 export const iconMap: Record<string, LucideIcon> = Object.fromEntries(
-  availableIcons.map(icon => [icon.name, icon.component])
+  availableIcons.map(icon => [icon.key, icon.component])
 );

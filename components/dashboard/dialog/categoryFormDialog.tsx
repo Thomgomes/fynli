@@ -84,10 +84,10 @@ export function CategoryFormDialog({ open, onOpenChange, editingCategory, onSucc
                       <SelectTrigger><SelectValue placeholder="Selecione um ícone..." /></SelectTrigger>
                       <SelectContent>
                         {availableIcons.map(icon => (
-                          <SelectItem key={icon.name} value={icon.name}>
+                          <SelectItem key={icon.key} value={icon.key}>
                             <div className="flex items-center gap-2">
                               <icon.component className="h-4 w-4" />
-                              <span>{icon.name}</span>
+                              <span>{icon.label}</span>
                             </div>
                           </SelectItem>
                         ))}
