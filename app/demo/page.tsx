@@ -28,38 +28,9 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
+import { DemoHeader } from "@/components/dashboard/headerDemo";
 
-// --- Componente de Ação do Cabeçalho (com Verificação de Auth) ---
-function HeaderActions() {
-  const { user, isLoading } = useAuth();
-
-  if (isLoading) {
-    return <Skeleton className="h-10 w-28" />;
-  }
-
-  if (user) {
-    return (
-      <Button asChild>
-        <Link href="/dashboard">Aceder ao Dashboard</Link>
-      </Button>
-    );
-  }
-
-  return (
-    <div className="flex gap-2">
-      <Button variant="ghost" asChild>
-        <Link href="/auth">Entrar</Link>
-      </Button>
-      <Button asChild>
-        <Link href="/auth">Começar Grátis</Link>
-      </Button>
-    </div>
-  );
-}
-
-// --- Componente Principal da Página de Demonstração ---
 export default function DemoPage() {
-  // Não precisamos mais de 'useRef' ou 'useInView'
 
   const features = [
     {
@@ -125,14 +96,7 @@ export default function DemoPage() {
   return (
     <div className="flex flex-col min-h-screen bg-background text-foreground">
       {/* --- Cabeçalho --- */}
-      <header className="sticky top-0 z-50 w-full border-b bg-card/95 backdrop-blur-sm">
-        <div className="container mx-auto h-16 flex items-center justify-between px-4 md:px-6">
-          <Link href="/" className="flex items-center gap-2">
-            <h1 className="text-xl font-bold text-primary">Fynli</h1>
-          </Link>
-          <HeaderActions />
-        </div>
-      </header>
+      <DemoHeader />
 
       {/* --- Seção Hero --- */}
       <main className="flex-1">

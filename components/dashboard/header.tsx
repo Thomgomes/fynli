@@ -45,7 +45,7 @@ export function DashboardHeader({ onAddExpenseClick }: DashboardHeaderProps) {
     <header className="sticky top-0 z-30 flex h-16 items-center justify-between gap-4 border-b bg-card px-6 shadow-sm">
       <div>
         <h1 className="hidden md:block text-2xl font-semibold text-foreground">Dashboard</h1>
-        <h1 className="md:hidden block text-2xl font-semibold text-primary">Fynli</h1>
+        <Link href={'/demo'} className="md:hidden block text-2xl font-semibold text-primary">Fynli</Link>
 
       </div>
 
