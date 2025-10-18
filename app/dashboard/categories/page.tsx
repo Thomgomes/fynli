@@ -30,8 +30,7 @@ import {
 } from "@/components/ui/tooltip";
 
 export default function CategoriesPage() {
-  const { categories, isLoading, deleteCategory } =
-    useCategories();
+  const { categories, isLoading, deleteCategory } = useCategories();
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingCategory, setEditingCategory] =
@@ -93,25 +92,25 @@ export default function CategoriesPage() {
                         {IconComponent && (
                           <IconComponent className="h-5 w-5 text-muted-foreground" />
                         )}
-                        <div className="h-6 w-6 rounded-full" style={{ backgroundColor: cat.color || '#ccc' }} />
+                        <div
+                          className="h-6 w-6 rounded-full"
+                          style={{ backgroundColor: cat.color || "#ccc" }}
+                        />
                         <span className="font-medium">{cat.name}</span>
                       </div>
                       {isGlobal && (
-                        <div className="mx-2">
-
-                          <Tooltip>
-                            <TooltipTrigger>
-                              <Lock className="h-4 w-4 text-muted-foreground" />
-                            </TooltipTrigger>
-                            <TooltipContent>
-                              <p>
-                                Esta é uma categoria padrão e não pode ser
-                                editada ou deletada.
-                              </p>
-                            </TooltipContent>
-                          </Tooltip>
-                        </div>
-                        )}
+                        <Tooltip>
+                          <TooltipTrigger>
+                            <Lock className="h-4 w-4 text-muted-foreground mx-2" />
+                          </TooltipTrigger>
+                          <TooltipContent>
+                            <p>
+                              Esta é uma categoria padrão e não pode ser editada
+                              ou deletada.
+                            </p>
+                          </TooltipContent>
+                        </Tooltip>
+                      )}
                       {!isGlobal && (
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild>

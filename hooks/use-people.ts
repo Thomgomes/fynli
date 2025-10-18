@@ -1,15 +1,17 @@
 "use client";
+
 import useSWR from 'swr';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { Tables, TablesInsert, TablesUpdate } from '@/integrations/supabase/types';
 import { toast } from 'sonner';
 
+// O fetcher agora busca perfis do usuário E perfis globais
 const fetcher = async ([_key, userId]: [string, string]): Promise<Tables<'people'>[]> => {
   const { data, error } = await supabase
     .from('people')
     .select('*')
-    .eq('user_id', userId)
+    .or(`user_id.eq.${userId},user_id.is.null`) // AQUI ESTÁ A MUDANÇA
     .order('name', { ascending: true });
 
   if (error) {
@@ -27,6 +29,8 @@ export function usePeople() {
     revalidateOnFocus: false,
   });
   
+  // O resto do hook (add, update, delete) não muda,
+  // pois ele só vai operar em perfis que o usuário criar.
   const addPerson = async (values: { name: string; color: string }) => {
     if (!user) return;
     const payload: TablesInsert<'people'> = { ...values, user_id: user.id };

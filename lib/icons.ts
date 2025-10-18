@@ -2,7 +2,8 @@ import {
   type LucideIcon,
   ShoppingCart, Gamepad2, Dog, Car, Puzzle, Home, UtensilsCrossed,
   HeartPulse, Shirt, Bus, Plane, Gift, GraduationCap, Fuel, Film,
-  BookOpen, Landmark, HandCoins, Pizza, Coffee, PawPrint
+  BookOpen, Landmark, HandCoins, Pizza, Coffee, PawPrint,
+  HelpCircle
 } from 'lucide-react';
 
 export type Icon = {
@@ -34,6 +35,7 @@ export const availableIcons: Icon[] = [
   { key: 'Landmark', label: 'Banco', component: Landmark },
   { key: 'HandCoins', label: 'Moedas', component: HandCoins },
   { key: 'Puzzle', label: 'Puzzle/Jogos', component: Puzzle },
+  { key: 'HelpCircle', label: 'Indefinido', component: HelpCircle },
 ];
 
 export const iconMap: Record<string, LucideIcon> = Object.fromEntries(
