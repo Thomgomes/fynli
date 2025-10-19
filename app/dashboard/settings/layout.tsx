@@ -23,7 +23,7 @@ export default function SettingsLayout({
   return (
     <div className="flex flex-col md:flex-row gap-10">
       <aside className="w-full md:w-1/4 lg:w-1/5 flex-shrink-0">
-        <nav className="flex flex-row md:flex-col gap-2">
+        <nav className="flex flex-row md:flex-col sm:justify-between justify-around gap-2">
           {settingsNav.map((item) => (
             <Link
               key={item.href}
@@ -36,7 +36,7 @@ export default function SettingsLayout({
               )}
             >
               <item.icon className="h-5 w-5 flex-shrink-0" />
-              <span className="truncate">{item.title}</span>
+              <span className="sm:block hidden truncate">{item.title}</span>
             </Link>
           ))}
           
