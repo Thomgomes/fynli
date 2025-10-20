@@ -4,6 +4,7 @@ import "./globals.css";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { Toaster } from "sonner";
 import { ThemeProvider } from "@/contexts/ThemeContext";
+import { ReactNode } from "react";
 
 const sora = Sora({
   subsets: ["latin"],
@@ -18,7 +19,7 @@ export const metadata: Metadata = {
 export default function RootLayout({
   children,
 }: Readonly<{
-  children: React.ReactNode;
+  children: ReactNode;
 }>) {
   return (
     <html lang="pt-br" suppressHydrationWarning>

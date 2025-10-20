@@ -24,13 +24,14 @@ import { ExpenseWithRelations } from "@/hooks/use-transactions";
 import { Badge } from "@/components/ui/badge";
 import { iconMap } from "@/lib/icons";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
+import { ElementType } from "react";
 
 const statusLabels: Record<string, { label: string; className: string }> = {
   pending: { label: "Pendente", className: "bg-amber-500/20 text-amber-700 border-amber-500/30" },
   reimbursed: { label: "Reembolsado", className: "bg-green-500/20 text-green-700 border-green-500/30" },
 };
 
-const paymentMethodMap: Record<string, { label: string; icon: React.ElementType }> = {
+const paymentMethodMap: Record<string, { label: string; icon: ElementType }> = {
   credito: { label: "Crédito", icon: CreditCard },
   debito: { label: "Débito", icon: Landmark },
   pix: { label: "Pix", icon: Smartphone },

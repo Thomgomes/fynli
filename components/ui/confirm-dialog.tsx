@@ -1,6 +1,6 @@
 "use client";
 
-import React from 'react';
+import { ReactNode } from 'react';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -17,7 +17,7 @@ interface ConfirmDialogProps {
   title: string;
   description: string;
   onConfirm: () => void;
-  children: React.ReactNode; // O botão ou item que vai acionar o dialog
+  children: ReactNode;
 }
 
 export function ConfirmDialog({ title, description, onConfirm, children }: ConfirmDialogProps) {
@@ -35,7 +35,6 @@ export function ConfirmDialog({ title, description, onConfirm, children }: Confi
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel>Cancelar</AlertDialogCancel>
-          {/* A ação de continuar chama a função que passamos via props */}
           <AlertDialogAction onClick={onConfirm}>
             Confirmar
           </AlertDialogAction>
