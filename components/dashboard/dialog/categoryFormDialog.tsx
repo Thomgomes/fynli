@@ -1,15 +1,26 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
-import React from "react";
-import { Formik, Form, Field, FormikHelpers } from 'formik';
-import * as Yup from 'yup';
+import { Formik, Form, Field, FormikHelpers } from "formik";
+import * as Yup from "yup";
 
 import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Tables } from "@/integrations/supabase/types";
 import { useCategories } from "@/hooks/use-categories";
 import { availableIcons } from "@/lib/icons";
@@ -17,8 +28,8 @@ import { availableIcons } from "@/lib/icons";
 interface CategoryFormDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  editingCategory?: Tables<'categories'> | null;
-  onSuccess?: () => void; // Callback opcional para quando a operação for bem-sucedida
+  editingCategory?: Tables<"categories"> | null;
+  onSuccess?: () => void;
 }
 
 type CategoryFormValues = {
@@ -28,15 +39,28 @@ type CategoryFormValues = {
 };
 
 const CategorySchema = Yup.object().shape({
-  name: Yup.string().min(2, 'Muito curto!').max(50, 'Muito longo!').required('O nome é obrigatório'),
-  icon: Yup.string().required('Selecione um ícone'),
-  color: Yup.string().matches(/^#[0-9A-F]{6}$/i, 'Cor inválida').required('Obrigatório'),
+  name: Yup.string()
+    .min(2, "Muito curto!")
+    .max(50, "Muito longo!")
+    .required("O nome é obrigatório"),
+  icon: Yup.string().required("Selecione um ícone"),
+  color: Yup.string()
+    .matches(/^#[0-9A-F]{6}$/i, "Cor inválida")
+    .required("Obrigatório"),
 });
 
-export function CategoryFormDialog({ open, onOpenChange, editingCategory, onSuccess }: CategoryFormDialogProps) {
+export function CategoryFormDialog({
+  open,
+  onOpenChange,
+  editingCategory,
+  onSuccess,
+}: CategoryFormDialogProps) {
   const { addCategory, updateCategory } = useCategories();
 
-  const handleFormSubmit = async (values: CategoryFormValues, { setSubmitting, resetForm }: FormikHelpers<CategoryFormValues>) => {
+  const handleFormSubmit = async (
+    values: CategoryFormValues,
+    { setSubmitting, resetForm }: FormikHelpers<CategoryFormValues>
+  ) => {
     try {
       if (editingCategory) {
         await updateCategory(editingCategory.id, values);
@@ -45,7 +69,7 @@ export function CategoryFormDialog({ open, onOpenChange, editingCategory, onSucc
       }
       resetForm();
       onOpenChange(false);
-      onSuccess?.(); // Chama o callback de sucesso, se existir
+      onSuccess?.();
     } catch (error) {
       console.error("Falha ao salvar categoria:", error);
     } finally {
@@ -57,13 +81,15 @@ export function CategoryFormDialog({ open, onOpenChange, editingCategory, onSucc
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>{editingCategory ? 'Editar Categoria' : 'Criar Nova Categoria'}</DialogTitle>
+          <DialogTitle>
+            {editingCategory ? "Editar Categoria" : "Criar Nova Categoria"}
+          </DialogTitle>
         </DialogHeader>
         <Formik
           initialValues={{
-            name: editingCategory?.name || '',
-            icon: editingCategory?.icon || 'ShoppingCart',
-            color: editingCategory?.color || '#3b82f6',
+            name: editingCategory?.name || "",
+            icon: editingCategory?.icon || "ShoppingCart",
+            color: editingCategory?.color || "#3b82f6",
           }}
           validationSchema={CategorySchema}
           onSubmit={handleFormSubmit}
@@ -73,17 +99,29 @@ export function CategoryFormDialog({ open, onOpenChange, editingCategory, onSucc
             <Form className="space-y-4">
               <div className="space-y-2">
                 <Label htmlFor="name">Nome da Categoria</Label>
-                <Field as={Input} name="name" id="name" placeholder="Ex: Supermercado" />
-                {errors.name && touched.name ? <p className="text-sm text-destructive">{errors.name}</p> : null}
+                <Field
+                  as={Input}
+                  name="name"
+                  id="name"
+                  placeholder="Ex: Supermercado"
+                />
+                {errors.name && touched.name ? (
+                  <p className="text-sm text-destructive">{errors.name}</p>
+                ) : null}
               </div>
               <div className="space-y-2">
                 <Label htmlFor="icon">Ícone</Label>
                 <Field name="icon">
                   {({ field }: any) => (
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
-                      <SelectTrigger><SelectValue placeholder="Selecione um ícone..." /></SelectTrigger>
+                    <Select
+                      onValueChange={field.onChange}
+                      defaultValue={field.value}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Selecione um ícone..." />
+                      </SelectTrigger>
                       <SelectContent>
-                        {availableIcons.map(icon => (
+                        {availableIcons.map((icon) => (
                           <SelectItem key={icon.key} value={icon.key}>
                             <div className="flex items-center gap-2">
                               <icon.component className="h-4 w-4" />
@@ -95,17 +133,33 @@ export function CategoryFormDialog({ open, onOpenChange, editingCategory, onSucc
                     </Select>
                   )}
                 </Field>
-                {errors.icon && touched.icon ? <p className="text-sm text-destructive">{errors.icon}</p> : null}
+                {errors.icon && touched.icon ? (
+                  <p className="text-sm text-destructive">{errors.icon}</p>
+                ) : null}
               </div>
               <div className="space-y-2">
                 <Label htmlFor="color">Cor</Label>
-                <Field as={Input} name="color" id="color" type="color" className="p-1 h-10 w-full" />
-                {errors.color && touched.color ? <p className="text-sm text-destructive">{errors.color}</p> : null}
+                <Field
+                  as={Input}
+                  name="color"
+                  id="color"
+                  type="color"
+                  className="p-1 h-10 w-full"
+                />
+                {errors.color && touched.color ? (
+                  <p className="text-sm text-destructive">{errors.color}</p>
+                ) : null}
               </div>
               <DialogFooter>
-                <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>Cancelar</Button>
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => onOpenChange(false)}
+                >
+                  Cancelar
+                </Button>
                 <Button type="submit" disabled={isSubmitting}>
-                  {isSubmitting ? 'Salvando...' : 'Salvar'}
+                  {isSubmitting ? "Salvando..." : "Salvar"}
                 </Button>
               </DialogFooter>
             </Form>
