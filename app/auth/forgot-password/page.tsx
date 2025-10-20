@@ -58,7 +58,7 @@ export default function ForgotPasswordPage() {
     }
     helpers.setSubmitting(false);
   };
-  
+
   const handleVerifyOtp = async () => {
     if (otp.length !== 6 || !userEmail) return;
 
@@ -70,14 +70,17 @@ export default function ForgotPasswordPage() {
     });
 
     if (error) {
-      toast.error("Erro na verificação", { description: "O código está incorreto ou expirou." });
+      toast.error("Erro na verificação", {
+        description: "O código está incorreto ou expirou.",
+      });
     } else {
-      toast.success("Código verificado!", { description: "Agora você pode criar uma nova senha." });
+      toast.success("Código verificado!", {
+        description: "Agora você pode criar uma nova senha.",
+      });
       router.push("/auth/update-password");
     }
     setIsVerifying(false);
   };
-
 
   return (
     <div className="min-h-screen bg-background flex items-center justify-center p-4">
@@ -104,25 +107,41 @@ export default function ForgotPasswordPage() {
                         <Mail className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                         <Field
                           as={Input}
-                          id="email" name="email" type="email"
+                          id="email"
+                          name="email"
+                          type="email"
                           placeholder="seu@email.com"
-                          className={`pl-10 ${touched.email && errors.email ? "border-destructive" : ""}`}
+                          className={`pl-10 ${
+                            touched.email && errors.email
+                              ? "border-destructive"
+                              : ""
+                          }`}
                           disabled={isSubmitting}
                         />
                       </div>
                       {touched.email && errors.email && (
-                        <p className="text-sm text-destructive">{errors.email}</p>
+                        <p className="text-sm text-destructive">
+                          {errors.email}
+                        </p>
                       )}
                     </div>
-                    <Button type="submit" className="w-full" disabled={isSubmitting}>
-                      {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                    <Button
+                      type="submit"
+                      className="w-full"
+                      disabled={isSubmitting}
+                    >
+                      {isSubmitting && (
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      )}
                       Enviar Código
                     </Button>
                   </Form>
                 )}
               </Formik>
               <div className="mt-4 text-center text-sm">
-                <Link href="/auth" className="underline">Voltar para o login</Link>
+                <Link href="/auth" className="underline">
+                  Voltar para o login
+                </Link>
               </div>
             </CardContent>
           </>
@@ -131,23 +150,32 @@ export default function ForgotPasswordPage() {
             <CardHeader className="text-center">
               <CardTitle className="text-2xl">Código de Recuperação</CardTitle>
               <CardDescription>
-                Enviamos um código de 6 dígitos para <strong>{userEmail}</strong>.
+                Enviamos um código de 6 dígitos para{" "}
+                <strong>{userEmail}</strong>.
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
               <div className="flex justify-center">
                 <InputOTP maxLength={6} value={otp} onChange={setOtp}>
                   <InputOTPGroup>
-                    {[...Array(6)].map((_, i) => <InputOTPSlot key={i} index={i} />)}
+                    {[...Array(6)].map((_, i) => (
+                      <InputOTPSlot key={i} index={i} />
+                    ))}
                   </InputOTPGroup>
                 </InputOTP>
               </div>
-              <Button onClick={handleVerifyOtp} disabled={isVerifying || otp.length < 6} className="w-full">
-                {isVerifying && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+              <Button
+                onClick={handleVerifyOtp}
+                disabled={isVerifying || otp.length < 6}
+                className="w-full"
+              >
+                {isVerifying && (
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                )}
                 Verificar Código
               </Button>
-               <div className="mt-4 text-center text-sm">
-                <Button variant="link" onClick={() => setStep('enter-email')}>
+              <div className="mt-4 text-center text-sm">
+                <Button variant="link" onClick={() => setStep("enter-email")}>
                   Não recebeu? Tente enviar novamente.
                 </Button>
               </div>

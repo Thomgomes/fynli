@@ -59,11 +59,10 @@ function UpdatePasswordComponent() {
     helpers.setSubmitting(false);
   };
 
-
   const handleCancel = async () => {
     await signOut();
     router.push("/auth");
-  }
+  };
   return (
     <div className="min-h-screen bg-background flex flex-col items-center justify-center p-4">
       <Card className="w-full max-w-md">
