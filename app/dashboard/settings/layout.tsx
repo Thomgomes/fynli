@@ -7,16 +7,20 @@ import { User, Palette, FileText } from "lucide-react";
 import { ReactNode } from "react";
 
 const settingsNav = [
-  { title: "Perfil e Segurança", href: "/dashboard/settings/profile", icon: User },
+  {
+    title: "Perfil e Segurança",
+    href: "/dashboard/settings/profile",
+    icon: User,
+  },
   { title: "Aparência", href: "/dashboard/settings/theme", icon: Palette },
-  { title: "Termos e Política", href: "/dashboard/settings/policy", icon: FileText },
+  {
+    title: "Termos e Política",
+    href: "/dashboard/settings/policy",
+    icon: FileText,
+  },
 ];
 
-export default function SettingsLayout({
-  children,
-}: {
-  children: ReactNode;
-}) {
+export default function SettingsLayout({ children }: { children: ReactNode }) {
   const pathname = usePathname();
 
   return (
@@ -38,13 +42,10 @@ export default function SettingsLayout({
               <span className="sm:block hidden truncate">{item.title}</span>
             </Link>
           ))}
-          
         </nav>
       </aside>
 
-      <div className="flex-1 min-w-0">
-        {children}
-      </div>
+      <div className="flex-1 min-w-0">{children}</div>
     </div>
   );
 }

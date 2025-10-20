@@ -34,8 +34,6 @@ export default function DashboardPage() {
   const monthAsNumber = selectedMonth === "todos" ? 0 : parseInt(selectedMonth);
 
   return (
-
-    
     <div className="space-y-6">
       <DashboardCards year={yearAsNumber} month={monthAsNumber} />
       <DashboardCharts

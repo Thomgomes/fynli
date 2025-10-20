@@ -1,9 +1,16 @@
 "use client";
 
 import { useAuth } from "@/contexts/AuthContext";
-import { Formik, Form, Field, FormikHelpers, ErrorMessage } from 'formik';
-import * as Yup from 'yup';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { Formik, Form, Field, FormikHelpers, ErrorMessage } from "formik";
+import * as Yup from "yup";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -13,14 +20,18 @@ import { useProfile } from "@/hooks/use-profile-settings";
 import { Skeleton } from "@/components/ui/skeleton";
 
 const ProfileSchema = Yup.object().shape({
-  name: Yup.string().min(2, 'Nome muito curto!').required('O nome é obrigatório'),
+  name: Yup.string()
+    .min(2, "Nome muito curto!")
+    .required("O nome é obrigatório"),
 });
 
 const PasswordSchema = Yup.object().shape({
-  password: Yup.string().min(8, 'A senha deve ter no mínimo 8 caracteres').required('Obrigatório'),
+  password: Yup.string()
+    .min(8, "A senha deve ter no mínimo 8 caracteres")
+    .required("Obrigatório"),
   confirmPassword: Yup.string()
-    .oneOf([Yup.ref('password')], 'As senhas não conferem')
-    .required('Confirme sua nova senha'),
+    .oneOf([Yup.ref("password")], "As senhas não conferem")
+    .required("Confirme sua nova senha"),
 });
 
 interface PasswordFormValues {
@@ -29,23 +40,27 @@ interface PasswordFormValues {
 }
 
 export default function ProfileSettingsPage() {
-  const { user, updatePassword } = useAuth(); 
+  const { user, updatePassword } = useAuth();
   const { profile, isLoading, updateProfile } = useProfile();
 
-  const googleName = user?.user_metadata?.display_name || user?.user_metadata?.full_name;
+  const googleName =
+    user?.user_metadata?.display_name || user?.user_metadata?.full_name;
 
-  const handleUpdateName = async (values: { name: string }, { setSubmitting }: FormikHelpers<{ name: string }>) => {
-    await updateProfile({ 
+  const handleUpdateName = async (
+    values: { name: string },
+    { setSubmitting }: FormikHelpers<{ name: string }>
+  ) => {
+    await updateProfile({
       display_name: values.name,
     });
     setSubmitting(false);
   };
 
   const handleUpdatePassword = async (
-    values: PasswordFormValues, 
+    values: PasswordFormValues,
     { setSubmitting, resetForm }: FormikHelpers<PasswordFormValues>
   ) => {
-    const { error } = await updatePassword(values.password); 
+    const { error } = await updatePassword(values.password);
     if (error) {
       toast.error("Erro ao atualizar a senha.", { description: error.message });
     } else {
@@ -58,13 +73,27 @@ export default function ProfileSettingsPage() {
   if (isLoading || !user) {
     return (
       <div className="space-y-8">
-        <Card><CardHeader><Skeleton className="h-6 w-32" /></CardHeader><CardContent><Skeleton className="h-40 w-full" /></CardContent></Card>
-        <Card><CardHeader><Skeleton className="h-6 w-32" /></CardHeader><CardContent><Skeleton className="h-40 w-full" /></CardContent></Card>
+        <Card>
+          <CardHeader>
+            <Skeleton className="h-6 w-32" />
+          </CardHeader>
+          <CardContent>
+            <Skeleton className="h-40 w-full" />
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader>
+            <Skeleton className="h-6 w-32" />
+          </CardHeader>
+          <CardContent>
+            <Skeleton className="h-40 w-full" />
+          </CardContent>
+        </Card>
       </div>
-    )
+    );
   }
-  
-  const currentDisplayName = profile?.display_name || googleName || '';
+
+  const currentDisplayName = profile?.display_name || googleName || "";
 
   return (
     <div className="space-y-8">
@@ -84,18 +113,29 @@ export default function ProfileSettingsPage() {
               <CardContent className="space-y-6">
                 <div className="space-y-2">
                   <Label htmlFor="email">E-mail</Label>
-                  <Input id="email" value={user.email || ''} disabled />
+                  <Input id="email" value={user.email || ""} disabled />
                 </div>
-                
+
                 <div className="space-y-2">
                   <Label htmlFor="name">Nome de Usuário</Label>
-                  <Field as={Input} name="name" id="name" placeholder="Digite seu nome..." />
-                  <ErrorMessage name="name" component="p" className="text-sm text-destructive" />
+                  <Field
+                    as={Input}
+                    name="name"
+                    id="name"
+                    placeholder="Digite seu nome..."
+                  />
+                  <ErrorMessage
+                    name="name"
+                    component="p"
+                    className="text-sm text-destructive"
+                  />
                 </div>
               </CardContent>
               <CardFooter>
                 <Button type="submit" disabled={isSubmitting}>
-                  {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                  {isSubmitting && (
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  )}
                   Salvar Perfil
                 </Button>
               </CardFooter>
@@ -105,7 +145,7 @@ export default function ProfileSettingsPage() {
       </Formik>
 
       <Formik
-        initialValues={{ password: '', confirmPassword: '' }}
+        initialValues={{ password: "", confirmPassword: "" }}
         validationSchema={PasswordSchema}
         onSubmit={handleUpdatePassword}
       >
@@ -119,18 +159,42 @@ export default function ProfileSettingsPage() {
               <CardContent className="space-y-4">
                 <div className="space-y-2">
                   <Label htmlFor="password">Nova Senha</Label>
-                  <Field as={Input} name="password" id="password" type="password" />
-                  <ErrorMessage name="password" component="p" className="text-sm text-destructive" />
+                  <Field
+                    as={Input}
+                    name="password"
+                    id="password"
+                    type="password"
+                  />
+                  <ErrorMessage
+                    name="password"
+                    component="p"
+                    className="text-sm text-destructive"
+                  />
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="confirmPassword">Confirmar Nova Senha</Label>
-                  <Field as={Input} name="confirmPassword" id="confirmPassword" type="password" />
-                  <ErrorMessage name="confirmPassword" component="p" className="text-sm text-destructive" />
+                  <Field
+                    as={Input}
+                    name="confirmPassword"
+                    id="confirmPassword"
+                    type="password"
+                  />
+                  <ErrorMessage
+                    name="confirmPassword"
+                    component="p"
+                    className="text-sm text-destructive"
+                  />
                 </div>
               </CardContent>
               <CardFooter>
-                <Button type="submit" variant="destructive" disabled={isSubmitting}>
-                  {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                <Button
+                  type="submit"
+                  variant="destructive"
+                  disabled={isSubmitting}
+                >
+                  {isSubmitting && (
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  )}
                   Atualizar Senha
                 </Button>
               </CardFooter>
