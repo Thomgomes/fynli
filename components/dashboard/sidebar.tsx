@@ -6,7 +6,6 @@ import { usePathname } from "next/navigation";
 import {
   LayoutDashboard,
   Users,
-  BarChart3,
   Settings,
   ChevronLeft,
   ChevronRight,
@@ -21,7 +20,11 @@ const sidebarItems = [
   { title: "Pessoas", href: "/dashboard/people", icon: Users },
   { title: "Categorias", href: "/dashboard/categories", icon: Tags },
   { title: "Transações", href: "/dashboard/transactions", icon: FileText },
-  { title: "Configurações", href: "/dashboard/settings/profile", icon: Settings },
+  {
+    title: "Configurações",
+    href: "/dashboard/settings/profile",
+    icon: Settings,
+  },
 ];
 
 export function DashboardSidebar() {

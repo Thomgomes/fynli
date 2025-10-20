@@ -46,7 +46,7 @@ export function DemoHeader() {
 
       <div className="flex items-center gap-2 sm:gap-4">
         <ThemeButton />
-        
+
         {user ? (
           <DropdownMenu>
             <DropdownMenuTrigger asChild>

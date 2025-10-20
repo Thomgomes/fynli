@@ -30,11 +30,18 @@ export function DashboardCards({ year, month }: DashboardCardsProps) {
 
   const formatCurrency = (value: number | null | undefined) => {
     if (value === null || value === undefined) return "R$ 0,00";
-    return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value);
+    return new Intl.NumberFormat("pt-BR", {
+      style: "currency",
+      currency: "BRL",
+    }).format(value);
   };
-  
+
   if (error) {
-    return <div className="text-sm text-destructive p-4 border border-destructive/50 bg-destructive/10 rounded-lg">Erro ao carregar dados dos cards.</div>;
+    return (
+      <div className="text-sm text-destructive p-4 border border-destructive/50 bg-destructive/10 rounded-lg">
+        Erro ao carregar dados dos cards.
+      </div>
+    );
   }
 
   if (isLoading || !stats) {
@@ -50,23 +57,25 @@ export function DashboardCards({ year, month }: DashboardCardsProps) {
   const periodLabel = month === 0 ? "neste ano" : "neste mês";
 
   const cards = [
-    { 
-      title: month === 0 ? "Gasto Total do Ano" : "Gasto Total do Mês", 
-      value: formatCurrency(stats.total_in_period), 
-      icon: TrendingUp, 
-      description: `no período selecionado` 
+    {
+      title: month === 0 ? "Gasto Total do Ano" : "Gasto Total do Mês",
+      value: formatCurrency(stats.total_in_period),
+      icon: TrendingUp,
+      description: `no período selecionado`,
     },
-    { 
-      title: "Perfil com Mais Gastos", 
-      value: stats.top_person_name || 'Nenhum', 
-      icon: Users, 
-      description: `com ${formatCurrency(stats.top_person_amount)} ${periodLabel}`
+    {
+      title: "Perfil com Mais Gastos",
+      value: stats.top_person_name || "Nenhum",
+      icon: Users,
+      description: `com ${formatCurrency(
+        stats.top_person_amount
+      )} ${periodLabel}`,
     },
-    { 
-      title: "Gasto Total (Geral)", 
-      value: formatCurrency(stats.total_all_time), 
-      icon: PiggyBank, 
-      description: "desde o início" 
+    {
+      title: "Gasto Total (Geral)",
+      value: formatCurrency(stats.total_all_time),
+      icon: PiggyBank,
+      description: "desde o início",
     },
   ];
 
@@ -75,11 +84,15 @@ export function DashboardCards({ year, month }: DashboardCardsProps) {
       {cards.map((card) => (
         <Card key={card.title} className="w-full min-w-[240px] flex-1">
           <CardHeader className="flex flex-row items-center justify-between">
-            <CardTitle className="text-sm font-medium text-muted-foreground">{card.title}</CardTitle>
+            <CardTitle className="text-sm font-medium text-muted-foreground">
+              {card.title}
+            </CardTitle>
             <card.icon className="h-5 w-5 text-muted-foreground" />
           </CardHeader>
           <CardContent className="-mt-3 md:-mt-2">
-            <div className="text-2xl md:text-3xl font-bold text-foreground">{card.value}</div>
+            <div className="text-2xl md:text-3xl font-bold text-foreground">
+              {card.value}
+            </div>
             <p className="text-xs text-muted-foreground">{card.description}</p>
           </CardContent>
         </Card>

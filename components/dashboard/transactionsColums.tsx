@@ -27,8 +27,14 @@ import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { ElementType } from "react";
 
 const statusLabels: Record<string, { label: string; className: string }> = {
-  pending: { label: "Pendente", className: "bg-amber-500/20 text-amber-700 border-amber-500/30" },
-  reimbursed: { label: "Reembolsado", className: "bg-green-500/20 text-green-700 border-green-500/30" },
+  pending: {
+    label: "Pendente",
+    className: "bg-amber-500/20 text-amber-700 border-amber-500/30",
+  },
+  reimbursed: {
+    label: "Reembolsado",
+    className: "bg-green-500/20 text-green-700 border-green-500/30",
+  },
 };
 
 const paymentMethodMap: Record<string, { label: string; icon: ElementType }> = {
@@ -82,14 +88,21 @@ export const getColumns = ({
   {
     accessorKey: "amount",
     header: ({ column }) => (
-      <Button variant="ghost" onClick={() => column.toggleSorting(column.getIsSorted() === "asc")} className="text-right w-full justify-end p-0 hover:bg-transparent">
+      <Button
+        variant="ghost"
+        onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        className="text-right w-full justify-end p-0 hover:bg-transparent"
+      >
         Valor
         <ArrowUpDown className="ml-2 h-4 w-4" />
       </Button>
     ),
     cell: ({ row }) => {
       const amount = parseFloat(row.getValue("amount"));
-      const formatted = new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(amount);
+      const formatted = new Intl.NumberFormat("pt-BR", {
+        style: "currency",
+        currency: "BRL",
+      }).format(amount);
       return <div className="text-right font-medium">{formatted}</div>;
     },
   },
@@ -98,8 +111,10 @@ export const getColumns = ({
     header: "Pagamento",
     cell: ({ row }) => {
       const paymentMethod = row.original.payment_method;
-      if (!paymentMethod) return <span className="text-muted-foreground">N/A</span>;
-      const { label, icon: Icon } = paymentMethodMap[paymentMethod] || paymentMethodMap.outro;
+      if (!paymentMethod)
+        return <span className="text-muted-foreground">N/A</span>;
+      const { label, icon: Icon } =
+        paymentMethodMap[paymentMethod] || paymentMethodMap.outro;
       return (
         <div className="flex items-center gap-2">
           <Icon className="h-4 w-4 text-muted-foreground" />
@@ -122,7 +137,11 @@ export const getColumns = ({
         return <span className="text-muted-foreground">-</span>;
       }
       const { label, className } = statusLabels[status];
-      return <Badge variant="outline" className={className}>{label}</Badge>;
+      return (
+        <Badge variant="outline" className={className}>
+          {label}
+        </Badge>
+      );
     },
     // Esconda em mobile
     meta: {
@@ -133,12 +152,19 @@ export const getColumns = ({
   {
     accessorKey: "date",
     header: ({ column }) => (
-      <Button variant="ghost" onClick={() => column.toggleSorting(column.getIsSorted() === "asc")} className="p-0 hover:bg-transparent">
+      <Button
+        variant="ghost"
+        onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        className="p-0 hover:bg-transparent"
+      >
         Data
         <ArrowUpDown className="ml-2 h-4 w-4" />
       </Button>
     ),
-    cell: ({ row }) => new Date(row.original.date).toLocaleDateString("pt-BR", { timeZone: "UTC" }),
+    cell: ({ row }) =>
+      new Date(row.original.date).toLocaleDateString("pt-BR", {
+        timeZone: "UTC",
+      }),
     // Esconda em mobile
     meta: {
       className: "hidden sm:table-cell",
@@ -161,7 +187,11 @@ export const getColumns = ({
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
             <DropdownMenuLabel>Ações</DropdownMenuLabel>
-            <DropdownMenuItem onClick={() => onEdit(expense)} disabled={isInstallment} className="gap-2 cursor-pointer">
+            <DropdownMenuItem
+              onClick={() => onEdit(expense)}
+              disabled={isInstallment}
+              className="gap-2 cursor-pointer"
+            >
               <Edit className="h-4 w-4" />
               <span>Editar {isInstallment && "(N/A)"}</span>
             </DropdownMenuItem>
@@ -170,7 +200,10 @@ export const getColumns = ({
               description={`A despesa "${expense.description}" será permanentemente deletada.`}
               onConfirm={() => onDelete(expense.id)}
             >
-              <DropdownMenuItem onSelect={(e) => e.preventDefault()} className="gap-2 text-destructive cursor-pointer">
+              <DropdownMenuItem
+                onSelect={(e) => e.preventDefault()}
+                className="gap-2 text-destructive cursor-pointer"
+              >
                 <Trash2 className="h-4 w-4" />
                 <span>Deletar</span>
               </DropdownMenuItem>

@@ -1,7 +1,13 @@
 "use client";
 
 import Link from "next/link";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+} from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";
@@ -9,11 +15,11 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { useRecentTransactions } from "@/hooks/use-recent-transactions";
 
 const paymentMethodLabels = {
-  credito: 'Crédito',
-  debito: 'Débito',
-  pix: 'Pix',
-  dinheiro: 'Dinheiro',
-  outro: 'Outro',
+  credito: "Crédito",
+  debito: "Débito",
+  pix: "Pix",
+  dinheiro: "Dinheiro",
+  outro: "Outro",
 };
 
 function TransactionSkeleton() {
@@ -32,20 +38,29 @@ export function RecentTransactions() {
   const { transactions, isLoading, error } = useRecentTransactions();
 
   const formatCurrency = (value: number) => {
-    return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value);
+    return new Intl.NumberFormat("pt-BR", {
+      style: "currency",
+      currency: "BRL",
+    }).format(value);
   };
 
   const renderContent = () => {
     if (isLoading) {
       return (
         <div className="space-y-2">
-          {[...Array(3)].map((_, i) => <TransactionSkeleton key={i} />)}
+          {[...Array(3)].map((_, i) => (
+            <TransactionSkeleton key={i} />
+          ))}
         </div>
       );
     }
 
     if (error) {
-        return <div className="text-center py-8 text-sm text-destructive">Erro ao carregar transações.</div>;
+      return (
+        <div className="text-center py-8 text-sm text-destructive">
+          Erro ao carregar transações.
+        </div>
+      );
     }
 
     if (transactions?.length === 0) {
@@ -55,26 +70,37 @@ export function RecentTransactions() {
         </div>
       );
     }
-    
+
     return (
       <div className="space-y-2">
         {transactions?.map((expense) => (
-          <div key={expense.id} className="flex items-center justify-between p-3 rounded-lg hover:bg-muted/50 transition-colors">
+          <div
+            key={expense.id}
+            className="flex items-center justify-between p-3 rounded-lg hover:bg-muted/50 transition-colors"
+          >
             <div className="flex items-center gap-4">
               <div className="flex-1">
-                <p className="font-semibold text-foreground truncate">{expense.description}</p>
+                <p className="font-semibold text-foreground truncate">
+                  {expense.description}
+                </p>
                 <p className="text-sm text-muted-foreground">
-                  {expense.people?.name || 'Desconhecido'} • {paymentMethodLabels[expense.payment_method as keyof typeof paymentMethodLabels] || 'N/A'} • {new Date(expense.date).toLocaleDateString("pt-BR", { timeZone: 'UTC' })}
+                  {expense.people?.name || "Desconhecido"} •{" "}
+                  {paymentMethodLabels[
+                    expense.payment_method as keyof typeof paymentMethodLabels
+                  ] || "N/A"}{" "}
+                  •{" "}
+                  {new Date(expense.date).toLocaleDateString("pt-BR", {
+                    timeZone: "UTC",
+                  })}
                 </p>
               </div>
             </div>
             <div className="text-right flex-shrink-0 ml-4">
-              <div className="font-semibold text-foreground">{formatCurrency(expense.amount)}</div>
+              <div className="font-semibold text-foreground">
+                {formatCurrency(expense.amount)}
+              </div>
               {expense.categories && (
-                <Badge 
-                  variant="outline"
-                  className="mt-1 font-normal"
-                >
+                <Badge variant="outline" className="mt-1 font-normal">
                   {expense.categories.name}
                 </Badge>
               )}
@@ -92,16 +118,19 @@ export function RecentTransactions() {
           <CardTitle>Transações Recentes</CardTitle>
           <CardDescription>Seus últimos 5 gastos registrados.</CardDescription>
         </div>
-        <Button asChild variant="outline" size="sm" className="gap-1 flex-shrink-0">
+        <Button
+          asChild
+          variant="outline"
+          size="sm"
+          className="gap-1 flex-shrink-0"
+        >
           <Link href="/dashboard/transactions">
             Ver todas
             <ArrowRight className="h-4 w-4" />
           </Link>
         </Button>
       </CardHeader>
-      <CardContent>
-        {renderContent()}
-      </CardContent>
+      <CardContent>{renderContent()}</CardContent>
     </Card>
   );
 }
