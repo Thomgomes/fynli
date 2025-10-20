@@ -1,6 +1,5 @@
 "use client";
 
-import React from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { Formik, Form, Field, FormikHelpers, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
@@ -13,12 +12,10 @@ import { Loader2 } from "lucide-react";
 import { useProfile } from "@/hooks/use-profile-settings";
 import { Skeleton } from "@/components/ui/skeleton";
 
-// Schema para o formulário de atualização de nome
 const ProfileSchema = Yup.object().shape({
   name: Yup.string().min(2, 'Nome muito curto!').required('O nome é obrigatório'),
 });
 
-// Schema para o formulário de atualização de senha
 const PasswordSchema = Yup.object().shape({
   password: Yup.string().min(8, 'A senha deve ter no mínimo 8 caracteres').required('Obrigatório'),
   confirmPassword: Yup.string()
@@ -35,11 +32,9 @@ export default function ProfileSettingsPage() {
   const { user, updatePassword } = useAuth(); 
   const { profile, isLoading, updateProfile } = useProfile();
 
-  // O nome do Google é apenas um fallback para o valor inicial
   const googleName = user?.user_metadata?.display_name || user?.user_metadata?.full_name;
 
   const handleUpdateName = async (values: { name: string }, { setSubmitting }: FormikHelpers<{ name: string }>) => {
-    // Agora só atualizamos o 'display_name' na nossa tabela 'profiles'
     await updateProfile({ 
       display_name: values.name,
     });
@@ -69,12 +64,10 @@ export default function ProfileSettingsPage() {
     )
   }
   
-  // O nome de exibição é o do nosso 'profile' ou, como fallback, o do Google.
   const currentDisplayName = profile?.display_name || googleName || '';
 
   return (
     <div className="space-y-8">
-      {/* Card 1: Atualização de Perfil (AGORA SÓ UM FORMULÁRIO) */}
       <Formik
         initialValues={{ name: currentDisplayName }}
         validationSchema={ProfileSchema}
@@ -111,7 +104,6 @@ export default function ProfileSettingsPage() {
         )}
       </Formik>
 
-      {/* Card 2: Segurança (Alteração de Senha) */}
       <Formik
         initialValues={{ password: '', confirmPassword: '' }}
         validationSchema={PasswordSchema}

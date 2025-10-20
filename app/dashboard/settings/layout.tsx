@@ -1,12 +1,10 @@
 "use client";
 
-import React from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { User, Palette, FileText } from "lucide-react";
 
-// Links para a nova sub-navegação
 const settingsNav = [
   { title: "Perfil e Segurança", href: "/dashboard/settings/profile", icon: User },
   { title: "Aparência", href: "/dashboard/settings/theme", icon: Palette },
