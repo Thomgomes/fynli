@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useCallback } from "react";
+import { useState, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -88,7 +88,6 @@ export default function PeoplePage() {
             ) : people && people.length > 0 ? (
               <div className="space-y-2">
                 {people.map((person) => {
-                  // Verificamos se o perfil é global (user_id é nulo)
                   const isGlobal = !person.user_id;
                   return (
                     <div
@@ -120,7 +119,6 @@ export default function PeoplePage() {
                         )}
                       </div>
 
-                      {/* As ações só aparecem para perfis customizados (não-globais) */}
                       {!isGlobal && (
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild>
@@ -167,12 +165,11 @@ export default function PeoplePage() {
           </CardContent>
         </Card>
 
-        {/* O modal de formulário é chamado aqui */}
         <PersonFormDialog
           open={isModalOpen}
           onOpenChange={setIsModalOpen}
           editingPerson={editingPerson}
-          onSuccess={() => setEditingPerson(null)} // Limpa o estado de edição
+          onSuccess={() => setEditingPerson(null)}
         />
       </div>
     </TooltipProvider>
