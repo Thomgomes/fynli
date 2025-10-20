@@ -1,8 +1,6 @@
 "use client";
 
-import React from "react";
 import Link from "next/link";
-import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 import {
   Users,
@@ -16,9 +14,7 @@ import {
   Circle,
   Tags,
   GitBranch,
-  ChevronDown,
 } from "lucide-react";
-import { Skeleton } from "@/components/ui/skeleton";
 import { motion } from "framer-motion";
 import Footer from "@/components/footer";
 import { DoughnutDemo } from "@/components/DoughnutDemo";
@@ -31,7 +27,6 @@ import {
 import { DemoHeader } from "@/components/dashboard/headerDemo";
 
 export default function DemoPage() {
-
   const features = [
     {
       icon: Users,
@@ -95,10 +90,8 @@ export default function DemoPage() {
 
   return (
     <div className="flex flex-col min-h-screen bg-background text-foreground">
-      {/* --- Cabeçalho --- */}
       <DemoHeader />
 
-      {/* --- Seção Hero --- */}
       <main className="flex-1">
         <section className="relative pt-32 pb-20 px-6 lg:px-8 overflow-hidden">
           <div className="max-w-7xl mx-auto">
@@ -180,11 +173,9 @@ export default function DemoPage() {
                       </span>
                     </div>
 
-                    {/* --- 2. GRÁFICO MOCKADO INSERIDO AQUI --- */}
                     <div className="h-64 w-full flex items-center justify-center">
                       <DoughnutDemo />
                     </div>
-                    {/* --- FIM DA MUDANÇA --- */}
 
                     <div className="mt-6 pt-6 border-t">
                       <div className="flex justify-between items-center">
@@ -272,7 +263,6 @@ export default function DemoPage() {
               </p>
             </motion.div>
 
-            {/* Accordion com animação suave e seta customizada */}
             <motion.div
               initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
