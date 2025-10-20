@@ -7,7 +7,11 @@ import { useAuth } from "@/contexts/AuthContext";
 export type ChartDataResponse = {
   monthly_expenses: { month: number; total: number }[];
   profile_distribution: { name: string; total: number; color: string }[];
-  category_distribution_for_month: { name: string; total: number; color: string | null }[];
+  category_distribution_for_month: {
+    name: string;
+    total: number;
+    color: string | null;
+  }[];
 };
 
 const fetcher = async ([_key, userId, year, month]: [
@@ -42,8 +46,9 @@ export function useChartData({ year, month }: { year: number; month: number }) {
     }
   );
 
-  return { 
-    chartData: data, 
-    isLoading, 
-    error };
+  return {
+    chartData: data,
+    isLoading,
+    error,
+  };
 }

@@ -1,7 +1,6 @@
-import useSWR from 'swr';
-import { supabase } from '@/integrations/supabase/client';
-import { useAuth } from '@/contexts/AuthContext';
-
+import useSWR from "swr";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/contexts/AuthContext";
 
 type DashboardStats = {
   total_in_period: number;
@@ -10,23 +9,33 @@ type DashboardStats = {
   top_person_amount: number | null;
 };
 
-const fetcher = async ([userId, year, month]: [string, number, number]): Promise<DashboardStats> => {
-  const { data, error } = await supabase.rpc('get_dashboard_stats', { 
+const fetcher = async ([userId, year, month]: [
+  string,
+  number,
+  number
+]): Promise<DashboardStats> => {
+  const { data, error } = await supabase.rpc("get_dashboard_stats", {
     user_id_param: userId,
     filter_year: year,
-    filter_month: month
+    filter_month: month,
   });
 
   if (error) {
     throw new Error(error.message);
   }
-  
+
   return data[0];
 };
 
-export function useDashboardStats({ year, month }: { year: number; month: number }) {
+export function useDashboardStats({
+  year,
+  month,
+}: {
+  year: number;
+  month: number;
+}) {
   const { user } = useAuth();
-  
+
   const key = user ? [user.id, year, month] : null;
 
   const { data, error, isLoading } = useSWR<DashboardStats>(key, fetcher);

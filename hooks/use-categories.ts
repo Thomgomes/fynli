@@ -1,23 +1,27 @@
 "use client";
 
-import useSWR from 'swr';
-import { supabase } from '@/integrations/supabase/client';
-import { useAuth } from '@/contexts/AuthContext';
-import { Tables, TablesInsert, TablesUpdate } from '@/integrations/supabase/types';
-import { toast } from 'sonner';
+import useSWR from "swr";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/contexts/AuthContext";
+import {
+  Tables,
+  TablesInsert,
+  TablesUpdate,
+} from "@/integrations/supabase/types";
+import { toast } from "sonner";
 
-const fetcher = async (userId: string): Promise<Tables<'categories'>[]> => {
+const fetcher = async (userId: string): Promise<Tables<"categories">[]> => {
   const { data, error } = await supabase
-    .from('categories')
-    .select('*')
+    .from("categories")
+    .select("*")
     .or(`user_id.eq.${userId},user_id.is.null`)
-    .order('name', { ascending: true });
+    .order("name", { ascending: true });
 
   if (error) {
     console.error("SWR Fetcher Error (useCategories):", error);
     throw new Error(error.message);
   }
-  
+
   return data || [];
 };
 
@@ -25,35 +29,60 @@ export function useCategories() {
   const { user } = useAuth();
   const key = user ? `categories-${user.id}` : null;
 
-  const { data: categories, error, isLoading, mutate: revalidate } = useSWR<Tables<'categories'>[]>(
-    key, 
-    () => fetcher(user!.id),
-    {
-      revalidateOnFocus: false,
-    }
-  );
-  
+  const {
+    data: categories,
+    error,
+    isLoading,
+    mutate: revalidate,
+  } = useSWR<Tables<"categories">[]>(key, () => fetcher(user!.id), {
+    revalidateOnFocus: false,
+  });
+
   const addCategory = async (name: string, color: string, icon?: string) => {
     if (!user) return;
-    const newCategoryPayload: TablesInsert<'categories'> = { name, icon: icon || 'ShoppingCart',color , user_id: user.id };
-    const { error } = await supabase.from('categories').insert(newCategoryPayload);
-    if (error) { toast.error("Erro ao criar categoria", {description: error.message}); throw error; }
+    const newCategoryPayload: TablesInsert<"categories"> = {
+      name,
+      icon: icon || "ShoppingCart",
+      color,
+      user_id: user.id,
+    };
+    const { error } = await supabase
+      .from("categories")
+      .insert(newCategoryPayload);
+    if (error) {
+      toast.error("Erro ao criar categoria", { description: error.message });
+      throw error;
+    }
     toast.success("Categoria criada com sucesso!");
     revalidate();
   };
 
-  const updateCategory = async (id: string, updates: TablesUpdate<'categories'>) => {
+  const updateCategory = async (
+    id: string,
+    updates: TablesUpdate<"categories">
+  ) => {
     if (!user) return;
-    const { error } = await supabase.from('categories').update(updates).eq('id', id);
-    if (error) { toast.error("Erro ao atualizar categoria", {description: error.message}); throw error; }
+    const { error } = await supabase
+      .from("categories")
+      .update(updates)
+      .eq("id", id);
+    if (error) {
+      toast.error("Erro ao atualizar categoria", {
+        description: error.message,
+      });
+      throw error;
+    }
     toast.success("Categoria atualizada!");
     revalidate();
   };
 
   const deleteCategory = async (id: string) => {
     if (!user) return;
-    const { error } = await supabase.from('categories').delete().eq('id', id);
-    if (error) { toast.error("Erro ao deletar categoria", {description: error.message}); throw error; }
+    const { error } = await supabase.from("categories").delete().eq("id", id);
+    if (error) {
+      toast.error("Erro ao deletar categoria", { description: error.message });
+      throw error;
+    }
     toast.success("Categoria deletada.");
     revalidate();
   };
