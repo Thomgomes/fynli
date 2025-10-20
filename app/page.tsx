@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 
 import { useEffect } from "react";
 
-export default function LoginPage() {
+export default function Page() {
   const { user, isLoading } = useAuth();
   const router = useRouter();
 
@@ -13,11 +13,10 @@ export default function LoginPage() {
     if (!isLoading && !user) {
       router.push("/demo");
     }
-    if (!isLoading && user){
+    if (!isLoading && user) {
       router.push("/dashboard");
     }
-
   }, [isLoading, user, router]);
 
-  return
+  return;
 }

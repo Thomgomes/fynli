@@ -8,7 +8,7 @@ import { ThemeProvider } from "@/contexts/ThemeContext";
 const sora = Sora({
   subsets: ["latin"],
   variable: "--font-sora",
-})
+});
 
 export const metadata: Metadata = {
   title: "Fynli",
@@ -22,20 +22,17 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="pt-br" suppressHydrationWarning>
-      <body
-        className={`${sora.variable} antialiased`}
-      >
+      <body className={`${sora.variable} antialiased`}>
         <ThemeProvider
-        attribute="class"
+          attribute="class"
           defaultTheme="system"
           enableSystem
           disableTransitionOnChange
         >
-
-        <AuthProvider>
-          {children}
-          <Toaster richColors />
-        </AuthProvider>
+          <AuthProvider>
+            {children}
+            <Toaster richColors />
+          </AuthProvider>
         </ThemeProvider>
       </body>
     </html>
