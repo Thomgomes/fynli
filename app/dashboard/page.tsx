@@ -47,6 +47,7 @@ export default function DashboardPage() {
       <RecentTransactions />
       <div className="md:hidden block">uhu meu fi</div>
       {/* não apagar essa div, ela é importante para o layout do dashboard em telas pequenas */}
+      {/* arrumar um modo de fazer isso de forma certa futuramente */}
     </div>
   );
 }

@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
-import React, { useState, useMemo, useEffect, useCallback } from "react";
+import { useState, useMemo, useEffect, useCallback } from "react";
 import InfiniteScroll from 'react-infinite-scroll-component';
 import { useTransactions, TransactionFilters, PaginationState, ExpenseWithRelations } from "@/hooks/use-transactions";
 import { getColumns } from "@/components/dashboard/transactionsColums";
@@ -31,10 +31,7 @@ export default function TransactionsPage() {
   const [selectedYear, setSelectedYear] = useState<string>();
   const [selectedMonth, setSelectedMonth] = useState<string>();
 
-  // --- INÍCIO DA CORREÇÃO ---
-  // 1. Desestruturamos 'transactions' diretamente, pois é o que nosso hook retorna.
   const { transactions, isLoading, deleteTransaction, hasMore, loadMore, pageCount } = useTransactions(filters);
-  // --- FIM DA CORREÇÃO ---
 
   const { people } = usePeople();
   const { categories } = useCategories();
@@ -106,12 +103,9 @@ export default function TransactionsPage() {
 
   const columns = useMemo(() => getColumns({ onEdit: handleEdit, onDelete: handleDelete }), [handleEdit, handleDelete]);
   
-  // --- INÍCIO DA CORREÇÃO ---
-  // 2. O useMemo agora opera sobre o array 'transactions' que vem do hook.
   const transactionsForDesktop = useMemo(() => {
     return transactions.slice(pagination.pageIndex * pagination.pageSize, (pagination.pageIndex + 1) * pagination.pageSize);
   }, [transactions, pagination]);
-  // --- FIM DA CORREÇÃO ---
 
   return (
     <div className="space-y-6">

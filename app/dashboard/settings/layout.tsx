@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { User, Palette, FileText } from "lucide-react";
+import { ReactNode } from "react";
 
 const settingsNav = [
   { title: "Perfil e Segurança", href: "/dashboard/settings/profile", icon: User },
@@ -14,7 +15,7 @@ const settingsNav = [
 export default function SettingsLayout({
   children,
 }: {
-  children: React.ReactNode;
+  children: ReactNode;
 }) {
   const pathname = usePathname();
 

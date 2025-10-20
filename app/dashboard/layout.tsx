@@ -3,14 +3,14 @@
 import { AddExpenseModal } from "@/components/dashboard/addExpanseModal";
 import { DashboardHeader } from "@/components/dashboard/header";
 import { DashboardSidebar } from "@/components/dashboard/sidebar";
-import { useState } from "react";
+import { ReactNode, useState } from "react";
 import { useSWRConfig } from "swr";
 
 
 export default function DashboardLayout({
   children,
 }: {
-  children: React.ReactNode;
+  children: ReactNode;
 }) {
   const [isAddExpenseOpen, setIsAddExpenseOpen] = useState(false);
   const { mutate } = useSWRConfig(); 
