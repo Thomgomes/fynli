@@ -14,7 +14,7 @@ export function ThemeButton() {
   }, []);
 
   if (!mounted) {
-    return <div className="h-9 w-9" />; 
+    return <div className="h-9 w-9" />;
   }
 
   return (
