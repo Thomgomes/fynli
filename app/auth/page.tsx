@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Formik, Form, Field, FormikHelpers } from "formik";
 import * as Yup from "yup";
@@ -55,7 +55,7 @@ export default function AuthPage() {
   const router = useRouter();
   const [mode, setMode] = useState<"signin" | "signup">("signin");
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (user) {
       router.push("/dashboard");
     }

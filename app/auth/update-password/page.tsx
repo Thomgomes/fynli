@@ -1,6 +1,6 @@
 "use client";
 
-import React, { Suspense } from "react";
+import { Suspense } from "react";
 import { useRouter } from "next/navigation";
 import { Formik, Form, Field, FormikHelpers } from "formik";
 import * as Yup from "yup";
