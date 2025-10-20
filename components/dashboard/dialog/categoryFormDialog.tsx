@@ -112,9 +112,9 @@ export function CategoryFormDialog({
               <div className="space-y-2">
                 <Label htmlFor="icon">Ícone</Label>
                 <Field name="icon">
-                  {({ field }: any) => (
+                  {({ field, form }: any) => (
                     <Select
-                      onValueChange={field.onChange}
+                      onValueChange={(value) => form.setFieldValue('icon', value)}
                       defaultValue={field.value}
                     >
                       <SelectTrigger>
