@@ -94,7 +94,7 @@ export default function DemoPage() {
 
       <main className="flex-1">
         <section className="relative pt-32 pb-20 px-6 lg:px-8 overflow-hidden">
-          <div className="max-w-7xl mx-auto">
+          <div className=" max-w-7xl mx-auto">
             <div className="grid lg:grid-cols-2 gap-12 items-center">
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
@@ -153,36 +153,36 @@ export default function DemoPage() {
                 initial={{ opacity: 0, scale: 0.9 }}
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ duration: 0.8, delay: 0.3 }}
-                className="relative"
+                className="relative w-full"
               >
-                <div className="relative w-full max-w-sm mx-auto">
-                  <motion.div
-                    className="absolute inset-0 bg-gradient-to-br from-primary/20 to-success/20 rounded-3xl blur-3xl"
-                    animate={{ scale: [1, 1.1, 1], opacity: [0.3, 0.5, 0.3] }}
-                    transition={{
-                      duration: 4,
-                      repeat: Infinity,
-                      ease: "easeInOut",
-                    }}
-                  />
-                  <div className="relative bg-card rounded-3xl shadow-2xl p-6 border">
-                    <div className="flex items-center gap-3 mb-4">
-                      <Smartphone className="text-primary" size={24} />
-                      <span className="text-lg font-semibold text-foreground">
+                <div className="max-w-sm mx-auto">
+                  <div className="relative bg-card rounded-3xl shadow-2xl p-4 xs:p-6 border overflow-hidden">
+                    <div className="flex items-center gap-2 xs:gap-3 mb-4">
+                      <Smartphone
+                        className="text-primary flex-shrink-0"
+                        size={24}
+                      />
+                      <span className="text-base xs:text-lg font-semibold text-foreground">
                         Distribuição por Perfil
                       </span>
                     </div>
 
-                    <div className="h-64 w-full flex items-center justify-center">
-                      <DoughnutDemo />
+                    {/* Container com aspect ratio fixo */}
+                    <div
+                      className="relative w-full"
+                      style={{ aspectRatio: "1/1", maxHeight: "256px" }}
+                    >
+                      <div className="absolute inset-0 flex items-center justify-center">
+                        <DoughnutDemo />
+                      </div>
                     </div>
 
-                    <div className="mt-6 pt-6 border-t">
-                      <div className="flex justify-between items-center">
-                        <span className="text-sm font-medium text-muted-foreground">
+                    <div className="mt-4 xs:mt-6 pt-4 xs:pt-6 border-t">
+                      <div className="flex justify-between items-center gap-2">
+                        <span className="text-xs xs:text-sm font-medium text-muted-foreground whitespace-nowrap">
                           Total do Período
                         </span>
-                        <span className="text-2xl font-bold text-foreground">
+                        <span className="text-xl xs:text-2xl font-bold text-foreground whitespace-nowrap">
                           R$ 1.005,98
                         </span>
                       </div>
@@ -216,7 +216,7 @@ export default function DemoPage() {
               </h2>
             </motion.div>
 
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <div className="grid xs:grid-cols-2 lg:grid-cols-3 gap-8">
               {features.map((feature, index) => {
                 const Icon = feature.icon;
                 return (
@@ -227,14 +227,16 @@ export default function DemoPage() {
                     viewport={{ once: true }}
                     transition={{ duration: 0.6, delay: index * 0.1 }}
                     whileHover={{ y: -5 }}
-                    className="bg-card rounded-2xl p-8 shadow-lg hover:shadow-xl transition-all border"
+                    className="bg-card rounded-2xl p-6 xs:p-5 md:p-6 lg:p-8 shadow-lg hover:shadow-xl transition-all border flex flex-col items-center text-center"
                   >
-                    <div className="inline-flex items-center justify-center w-14 h-14 bg-gradient-to-br from-primary/10 to-success/10 rounded-2xl mb-6">
-                      <Icon className="text-primary" size={28} />
+                    <div className="flex flex-col md:flex-row  justify-center items-center w-full gap-2">
+                      <div className="inline-flex items-center justify-center w-14 h-14 bg-gradient-to-br from-primary/10 to-success/10 rounded-2xl mb-6">
+                        <Icon className="text-primary" size={28} />
+                      </div>
+                      <h3 className="text-lg md:text-xl font-semibold text-foreground mb-3 lg:text-left">
+                        {feature.title}
+                      </h3>
                     </div>
-                    <h3 className="text-xl font-semibold text-foreground mb-3">
-                      {feature.title}
-                    </h3>
                     <p className="text-muted-foreground leading-relaxed">
                       {feature.description}
                     </p>
